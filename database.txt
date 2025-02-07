@@ -1,0 +1,31 @@
+-- create database --
+CREATE DATABASE IF NOT EXISTS daily_planet;
+USE workopia;
+
+-- create "users" table -- 
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+)
+
+-- create "articles" table --
+CREATE TABLE `daily_planet`.`articles` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `description` VARCHAR(255) NOT NULL,
+  `section_one` LONGTEXT NULL,
+  `section_two` LONGTEXT NULL,
+  `section_three` LONGTEXT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `user_id`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `daily_planet`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);

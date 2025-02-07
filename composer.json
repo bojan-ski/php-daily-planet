@@ -1,0 +1,16 @@
+{
+    "name": "bojan-ski/php-daily-planet",
+    "description": "Newsletter app",
+    "authors": [
+      {
+        "name": "BP development"
+      }
+    ],
+    "autoload": {
+      "psr-4": {
+        "Framework\\": "Framework/",
+        "App\\": "App/"
+      }
+    }
+  }
+  
