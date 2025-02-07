@@ -2,3 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+
+/* GENERAL */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background-color: rgb(255, 251, 237);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* MAIN */
+main{
+    flex: 1;
+}
+
+/* FOOTER */
+footer{
+    background-color: #000;
+}
