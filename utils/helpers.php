@@ -34,6 +34,11 @@ function loadPartial(string $name, $data = []): void
     }
 }
 
+// FORMAT DATE
+function formateData(string $date): string{
+    return date("d.m.Y", strtotime($date));
+}
+
 // REDIRECT USER
 function redirectUser(string $url): void
 {
