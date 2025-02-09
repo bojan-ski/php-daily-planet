@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 // LOAD PATH
 function basePath(string $path = ''): string
 {

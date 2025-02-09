@@ -10,12 +10,12 @@ use Exception;
 
 class Database
 {
-    public $conn;
+    protected $conn;
 
-    public function __construct(array $config)
+    protected function __construct(array $config)
     {
-        $dns = "mysql:host={$config['host']};dbname={$config['dbname']}";
-        $options = [
+        (string) $dns = "mysql:host={$config['host']};dbname={$config['dbname']}";
+        (array) $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
         ];
@@ -27,10 +27,10 @@ class Database
         }
     }
 
-    public function dbQuery(string $query, array $params = []): mixed
+    protected function dbQuery(string $query, array $params = []): mixed
     {
         try {
-            $str = $this->conn->prepare($query);
+            (array) $str = $this->conn->prepare($query);
 
             foreach ($params as $param => $value) {
                 $str->bindValue(':' . $param, $value);

@@ -1,11 +1,23 @@
 <?php
 
-use App\Controllers\HomeController;
+declare(strict_types=1);
 
+// import autoload
 require __DIR__ . '/vendor/autoload.php';
 
-// import helper
+// import & insatiate router
+use Framework\Router;
+
+$router = new Router();
+
+// import helpers
 require './utils/helpers.php';
 
-$nesto = new HomeController();
-$nesto->latestArticles();
+// import routes
+$routes = require basePath('App/routes.php');
+
+// app routes
+$uri = $_SERVER['REQUEST_URI'];
+$method = $_SERVER['REQUEST_METHOD'];
+
+$router->route($uri, $method);
