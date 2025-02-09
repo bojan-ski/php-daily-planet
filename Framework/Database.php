@@ -7,6 +7,7 @@ namespace Framework;
 use PDO;
 use PDOException;
 use Exception;
+use PDOStatement;
 
 class Database
 {
@@ -27,7 +28,7 @@ class Database
         }
     }
 
-    protected function dbQuery(string $query, array $params = []): mixed
+    protected function dbQuery(string $query, array $params = []): PDOStatement
     {
         try {
             (array) $str = $this->conn->prepare($query);

@@ -6,3 +6,4 @@ declare(strict_types=1);
 //get
 $router->get('/', 'HomeController', 'latestArticles');
 $router->get('/articles', 'ArticlesController', 'articlesList');
+$router->get('/articles/{id}', 'ArticlesController', 'displayArticle');

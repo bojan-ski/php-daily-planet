@@ -45,14 +45,40 @@ class Router
         // inspectAndDie($this->routes);
 
         foreach ($this->routes as $route) {
-            // inspectAndDie($route);
+            // inspect($route);
 
-            if ($route['uri'] == $uri && $route['method'] == $method) {
-                (string) $requestedController = 'App\\controllers\\' . $route['controller'];
-                (string) $requestedControllerMethod = $route['controllerMethod'];
+            (bool) $match = true;
+            (array) $uriSegments = explode('/', trim($uri, '/'));
+            // inspect($uriSegments);
+            // inspectAndDie($uriSegments);
+            (array) $routeSegments = explode('/', trim($route['uri'], '/'));
+            // inspect($routeSegments);
 
-                $instantiatedController = new $requestedController();
-                $instantiatedController->$requestedControllerMethod();
+            if (count($uriSegments) == count($routeSegments) && strtoupper($route['method']) == $method) {
+                (array) $params = [];
+
+                $match = true;
+
+                for ($i = 0; $i < count($uriSegments); $i++) {
+                    if ($routeSegments[$i] != $uriSegments[$i] && !preg_match('/\{(.+?)\}/', $routeSegments[$i])) {
+                        $match = false;
+                        break;
+                    }
+
+                    if (preg_match('/\{(.+?)\}/', $routeSegments[$i], $matches)) {
+                        $params[$matches[1]] = $uriSegments[$i];
+                    }
+                }
+
+                if ($match) {
+                    (string) $requestedController = 'App\\controllers\\' . $route['controller'];
+                    (string) $requestedControllerMethod = $route['controllerMethod'];
+
+                    $instantiatedController = new $requestedController();
+                    $instantiatedController->$requestedControllerMethod($params);
+
+                    return;
+                }
             }
         }
     }

@@ -11,6 +11,7 @@ function basePath(string $path = ''): string
 // LOAD VIEW
 function loadView(string $name, $data = []): void
 {
+    // inspect($data);
     (string) $viewPath = basePath("App/views/{$name}.view.php");
 
     if (file_exists($viewPath)) {
@@ -24,6 +25,7 @@ function loadView(string $name, $data = []): void
 // LOAD PARTIAL
 function loadPartial(string $name, $data = []): void
 {
+    // inspect($data);
     (string) $partialPath = basePath("App/views/partials/{$name}.php");
 
     if (file_exists($partialPath)) {
@@ -33,6 +35,12 @@ function loadPartial(string $name, $data = []): void
         echo "Partial '{$name}' not found!";
     }
 }
+
+// CHECK DISPLAYED CONTENT
+function checkContent(string $content): string
+{
+    return !empty(trim($content)) ? htmlspecialchars($content) : '';
+};
 
 // FORMAT DATE
 function formateData(string $date): string{
