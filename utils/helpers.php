@@ -10,11 +10,12 @@ function basePath(string $path = ''): string
 }
 
 // LOAD VIEW
-function loadView(string $name): void
+function loadView(string $name, $data = []): void
 {
     (string) $viewPath = basePath("App/views/{$name}.view.php");
 
     if (file_exists($viewPath)) {
+        extract($data);
         require $viewPath;
     } else {
         echo "View '{$name}' not found!";
@@ -22,11 +23,12 @@ function loadView(string $name): void
 }
 
 // LOAD PARTIAL
-function loadPartial(string $name): void
+function loadPartial(string $name, $data = []): void
 {
     (string) $partialPath = basePath("App/views/partials/{$name}.php");
 
     if (file_exists($partialPath)) {
+        extract($data);
         require $partialPath;
     } else {
         echo "Partial '{$name}' not found!";

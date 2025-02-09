@@ -12,9 +12,9 @@ class Database
 {
     public $conn;
 
-    public function __construct(string $config)
+    public function __construct(array $config)
     {
-        (string) $dns = "mysql:host={$config['host']};dbname={$config['dbname']}";
+        $dns = "mysql:host={$config['host']};dbname={$config['dbname']}";
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
