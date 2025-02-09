@@ -4,9 +4,9 @@
 
 <?php inspectAndDie($data); ?>
 
-<div class="home-page container mx-auto">
+<div class="articles-page container mx-auto">
     <h1 class="">
-        home
+        articles
     </h1>
 </div>
 

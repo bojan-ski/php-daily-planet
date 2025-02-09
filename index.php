@@ -16,7 +16,7 @@ require './utils/helpers.php';
 // import routes
 $routes = require basePath('App/routes.php');
 
-// app routes
+// app - user routes
 $uri = $_SERVER['REQUEST_URI'];
 $method = $_SERVER['REQUEST_METHOD'];
 
