@@ -29,6 +29,14 @@ h6 {
   font-family: "Times New Roman", Times, serif;
 }
 
+button:active{
+  transform: scale(0.99);
+}
+
+textarea{
+  resize: none;
+}
+
 /* HEADER */
 header .app-name h1 {
   font-size: 7rem;

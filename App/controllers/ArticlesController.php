@@ -19,7 +19,7 @@ class ArticlesController extends Database
     }
 
     // DISPLAY ALL ARTICLEs - articles page
-    public function articlesList(): void
+    public function displayArticlesPage(): void
     {
         try {
             (array) $articles = $this->db->dbQuery("SELECT * FROM articles ORDER BY created_at DESC")->fetchAll();
@@ -33,7 +33,7 @@ class ArticlesController extends Database
     }
 
     // DISPLAY SELECTED ARTICLE - selected article page
-    public function displayArticle(array $params): void
+    public function displaySelectedArticlePage(array $params): void
     {
         // get selected article
         (string) $id = $params['id'] ?? '';
