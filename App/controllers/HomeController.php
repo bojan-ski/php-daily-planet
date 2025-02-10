@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use Exception;
 use Framework\Database;
 
 class HomeController extends Database
@@ -18,10 +19,14 @@ class HomeController extends Database
 
     public function latestArticles(): void
     {
-        (array) $articles = $this->db->dbQuery("SELECT * FROM articles ORDER BY created_at DESC LIMIT 3")->fetchAll();
+        try {
+            (array) $articles = $this->db->dbQuery("SELECT * FROM articles ORDER BY created_at DESC LIMIT 3")->fetchAll();
 
-        loadView('home', [
-            'articles' => $articles
-        ]);
+            loadView('home', [
+                'articles' => $articles
+            ]);
+        } catch (Exception $e) {
+            ErrorController::randomError('Error while retrieving latest articles');
+        }
     }
 }

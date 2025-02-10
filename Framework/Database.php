@@ -8,6 +8,7 @@ use PDO;
 use PDOException;
 use Exception;
 use PDOStatement;
+use App\Controllers\ErrorController;
 
 class Database
 {
@@ -25,6 +26,8 @@ class Database
             $this->conn = new PDO($dns, $config['username'], $config['password'], $options);
         } catch (PDOException $e) {
             throw new Exception("Database connection failed: {$e->getMessage()}");
+
+            // ErrorController::randomError('DB error');
         }
     }
 
@@ -42,6 +45,8 @@ class Database
             return $str;
         } catch (PDOException $e) {
             throw new Exception("Query failed to execute: {$e->getMessage()}");
+
+            // ErrorController::randomError('DB error');
         }
     }
 }

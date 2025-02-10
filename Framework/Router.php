@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Framework;
 
+use App\Controllers\ErrorController;
+
 class Router
 {
-    protected $routes = [];
+    private $routes = [];
 
     private function createRoute(string $method, string $uri, string $controller, string $controllerMethod): void
     {
@@ -81,5 +83,7 @@ class Router
                 }
             }
         }
+
+        ErrorController::notFound();
     }
 }
