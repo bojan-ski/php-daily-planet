@@ -42,6 +42,46 @@ function checkContent(string $content): string
     return !empty(trim($content)) ? htmlspecialchars($content) : '';
 };
 
+// CHECK FORM DATA - is string
+function isString(string $formData, int $min, int $max): bool
+{
+    if(!empty($formData) && is_string($formData)){
+        $formDataValue = trim($formData);
+        $formDataLength = strlen($formDataValue);
+
+        return $formDataLength >= $min && $formDataLength <= $max;
+    }
+
+    return false;
+};
+
+// CHECK FORM DATA - is email
+function isEmail(string $formData): bool
+{
+    if(!empty($formData) && is_string($formData)){
+        $formDataValue = trim($formData);
+        $isFormDataEmail = filter_var($formDataValue, FILTER_VALIDATE_EMAIL);
+        $formDataLength = strlen($isFormDataEmail);
+
+        return $formDataLength >= 8 && $formDataLength <= 40;
+    }
+
+    return false;
+};
+
+// CHECK FORM DATA - does match
+function doesMatch(string $formDataOne, string $formDataTwo): bool
+{
+    if(!empty($formDataOne) && !empty($formDataTwo)){
+        $formDataValueOne = trim($formDataOne);
+        $formDataValueTwo = trim($formDataTwo);
+    
+        return $formDataValueOne == $formDataValueTwo;
+    }
+
+    return false;
+};
+
 // FORMAT DATE
 function formateData(string $date): string{
     return date("d.m.Y", strtotime($date));
