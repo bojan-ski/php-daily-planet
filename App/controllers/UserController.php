@@ -121,6 +121,71 @@ class UserController extends Database
     }
 
     public function login() {
-        inspectAndDie($_POST);
+        (string) $email = isset($_POST['email']) ? $_POST['email'] : '';
+        (string) $password = isset($_POST['password']) ? $_POST['password'] : '';
+
+        // check user form data & display error if exist
+        $errors = [];
+
+        if(!isEmail($email)){
+            $errors['email'] = 'Please provide a valid email.';
+        }
+        if(!isString($password, 2, 40)){
+            $errors['password'] = 'Please provide a valid password, between 2 and 40 characters.';
+        }
+
+        if(!empty($errors)){
+            loadView('auth/signIn',[
+                'errors' => $errors,
+                'user' => [
+                    'email' => $email
+                ]
+            ]);
+            return;
+        }   
+        
+        // check email
+        (array) $emailParams = [
+            'email' => $email
+        ];
+
+        try {
+            (array) $user = $this->db->dbQuery("SELECT * FROM users WHERE email = :email", $emailParams)->fetch();
+        } catch (Exception $e) {
+            ErrorController::randomError('Error while login');
+            return;
+        }
+
+        if(!isset($user) || empty($user['email'])){
+            $errors['bad_credentials'] = 'Incorrect Credentials';
+
+            loadView('auth/signIn',[
+                'errors' => $errors,
+            ]);
+
+            return;
+        }
+
+        // check password
+        if(!password_verify($password, $user['password'])){
+            $errors['bad_credentials'] = 'Incorrect Credentials';
+
+            loadView('auth/signIn', [
+                'errors' => $errors
+            ]);
+
+            return;
+        }
+
+        // store user in session
+        Session::set('user', [
+            'id' => $user['id'],
+            'name' => $user['name'],
+            'email' => $user['email'],
+            'role' => $user['role']
+        ]);  
+
+        //redirect user 
+        redirectUser('/');
     }
 }
