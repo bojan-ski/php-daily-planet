@@ -13,3 +13,5 @@ $router->post('/sign_up/register', 'UserController', 'register');
 // auth - sign in
 $router->get('/sign_in', 'UserController', 'displaySignInPage');
 $router->post('/sign_in/login', 'UserController', 'login');
+// auth - log out
+$router->post('/logout', 'UserController', 'logout');

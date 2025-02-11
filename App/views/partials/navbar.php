@@ -1,4 +1,4 @@
-<nav class="bg-gray-100 text-center py-1">
+<nav class="bg-gray-100 text-center py-2">
     <a href="/" class="nav-link btn btn-ghost text-7xl mx-7">
         Home
     </a>

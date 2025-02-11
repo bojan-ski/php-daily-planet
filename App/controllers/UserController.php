@@ -18,15 +18,18 @@ class UserController extends Database
         $this->db = new Database($config);
     }
 
-    public function displaySignUpPage() {
+    public function displaySignUpPage(): void
+    {
         loadView('auth/signUp');
     }
 
-    public function displaySignInPage() {
+    public function displaySignInPage(): void
+    {
         loadView('auth/signIn');
     }
 
-    public function register() {
+    public function register(): void
+    {
         (string) $name = isset($_POST['name']) ? $_POST['name'] : '';
         (string) $email = isset($_POST['email']) ? $_POST['email'] : '';
         (string) $password = isset($_POST['password']) ? $_POST['password'] : '';
@@ -35,26 +38,26 @@ class UserController extends Database
         // check user form data & display error if exist
         $errors = [];
 
-        if(!isString($name, 2, 40)){
+        if (!isString($name, 2, 40)) {
             $errors['name'] = 'Please provide a valid name, between 2 and 40 characters';
         }
-        if(!isEmail($email)){
+        if (!isEmail($email)) {
             $errors['email'] = 'Please provide a valid email.';
         }
-        if(!isString($password, 2, 40)){
+        if (!isString($password, 2, 40)) {
             $errors['password'] = 'Please provide a valid password, between 2 and 40 characters.';
         }
-        if(!isString($passwordConfirmation, 2, 40)){
+        if (!isString($passwordConfirmation, 2, 40)) {
             $errors['password_confirmation'] = 'Please provide a valid confirm password';
         }
-        if(!empty($password) && !empty($passwordConfirmation)){
-            if(!doesMatch($password, $passwordConfirmation)){
+        if (!empty($password) && !empty($passwordConfirmation)) {
+            if (!doesMatch($password, $passwordConfirmation)) {
                 $errors['password_confirmation'] = 'Passwords do not match';
-            }            
+            }
         }
 
-        if(!empty($errors)){
-            loadView('auth/signUp',[
+        if (!empty($errors)) {
+            loadView('auth/signUp', [
                 'errors' => $errors,
                 'user' => [
                     'name' => $name,
@@ -62,8 +65,8 @@ class UserController extends Database
                 ]
             ]);
             return;
-        }   
-        
+        }
+
         // check if email is taken
         (array) $emailParams = [
             'email' => $email
@@ -74,12 +77,12 @@ class UserController extends Database
         } catch (Exception $e) {
             ErrorController::randomError('Error while creating account');
             return;
-        } 
+        }
 
-        if(isset($emailTaken) && !empty($emailTaken['email'])){
+        if (isset($emailTaken) && !empty($emailTaken['email'])) {
             $errors['email'] = 'Email your provided is in use.';
 
-            loadView('auth/signUp',[
+            loadView('auth/signUp', [
                 'errors' => $errors,
                 'user' => [
                     'name' => $name,
@@ -114,36 +117,37 @@ class UserController extends Database
             'name' => $name,
             'email' => $email,
             'role' => 'reader'
-        ]);  
+        ]);
 
         //redirect user 
         redirectUser('/');
     }
 
-    public function login() {
+    public function login(): void
+    {
         (string) $email = isset($_POST['email']) ? $_POST['email'] : '';
         (string) $password = isset($_POST['password']) ? $_POST['password'] : '';
 
         // check user form data & display error if exist
         $errors = [];
 
-        if(!isEmail($email)){
+        if (!isEmail($email)) {
             $errors['email'] = 'Please provide a valid email.';
         }
-        if(!isString($password, 2, 40)){
+        if (!isString($password, 2, 40)) {
             $errors['password'] = 'Please provide a valid password, between 2 and 40 characters.';
         }
 
-        if(!empty($errors)){
-            loadView('auth/signIn',[
+        if (!empty($errors)) {
+            loadView('auth/signIn', [
                 'errors' => $errors,
                 'user' => [
                     'email' => $email
                 ]
             ]);
             return;
-        }   
-        
+        }
+
         // check email
         (array) $emailParams = [
             'email' => $email
@@ -156,10 +160,10 @@ class UserController extends Database
             return;
         }
 
-        if(!isset($user) || empty($user['email'])){
+        if (!isset($user) || empty($user['email'])) {
             $errors['bad_credentials'] = 'Incorrect Credentials';
 
-            loadView('auth/signIn',[
+            loadView('auth/signIn', [
                 'errors' => $errors,
             ]);
 
@@ -167,7 +171,7 @@ class UserController extends Database
         }
 
         // check password
-        if(!password_verify($password, $user['password'])){
+        if (!password_verify($password, $user['password'])) {
             $errors['bad_credentials'] = 'Incorrect Credentials';
 
             loadView('auth/signIn', [
@@ -183,7 +187,14 @@ class UserController extends Database
             'name' => $user['name'],
             'email' => $user['email'],
             'role' => $user['role']
-        ]);  
+        ]);
+
+        //redirect user 
+        redirectUser('/');
+    }
+
+    public function logout(): void {
+        Session::clearAll();
 
         //redirect user 
         redirectUser('/');
