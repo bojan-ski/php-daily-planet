@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use Framework\Database;
-use App\Controllers\ErrorController;
 use Exception;
 
 class ArticlesController extends Database

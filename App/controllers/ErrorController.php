@@ -4,32 +4,32 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-class ErrorController{
-    public static function randomError(string $errMessage = 'There was an error'){
+class ErrorController
+{
+    public static function randomError(string $errMessage = 'There was an error'): void
+    {
         loadView('error', [
             'errMessage' => $errMessage
         ]);
     }
 
-    public static function notFound(){
-        (string) $errMessage = 'The page you are looking for does not exist';
-
+    public static function notFound(): void
+    {
         http_response_code(404);
 
         loadView('error', [
             'errStatus' => '404',
-            'errMessage' => $errMessage
+            'errMessage' => 'The page you are looking for does not exist'
         ]);
     }
 
-    public static function accessDenied(){
-        (string) $errMessage = 'Access denied!';
-
+    public static function accessDenied(): void
+    {
         http_response_code(403);
 
         loadView('error', [
             'errStatus' => '403',
-            'errMessage' => $errMessage
+            'errMessage' => 'Access denied!'
         ]);
     }
 }

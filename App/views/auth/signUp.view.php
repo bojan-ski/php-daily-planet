@@ -17,7 +17,8 @@
                         name="name"
                         placeholder="Full Name"
                         class="w-full px-4 py-2 border focus:outline-none"
-                        value="<?= $user['name'] ?? '' ?>" />
+                        value="<?= $user['name'] ?? '' ?>"
+                        required />
                 </div>
                 <?php if (isset($errors) && !empty($errors['name'])): ?>
                     <?= loadPartial('formErrorMsg', [
@@ -30,7 +31,8 @@
                         name="email"
                         placeholder="Email Address"
                         class="w-full px-4 py-2 border focus:outline-none"
-                        value="<?= $user['email'] ?? '' ?>" />
+                        value="<?= $user['email'] ?? '' ?>"
+                        required />
                 </div>
                 <?php if (isset($errors) && !empty($errors['email'])): ?>
                     <?= loadPartial('formErrorMsg', [
@@ -42,7 +44,8 @@
                         type="password"
                         name="password"
                         placeholder="Password"
-                        class="w-full px-4 py-2 border focus:outline-none" />
+                        class="w-full px-4 py-2 border focus:outline-none"
+                        required />
                 </div>
                 <?php if (isset($errors) && !empty($errors['password'])): ?>
                     <?= loadPartial('formErrorMsg', [
@@ -54,7 +57,8 @@
                         type="password"
                         name="password_confirmation"
                         placeholder="Confirm Password"
-                        class="w-full px-4 py-2 border focus:outline-none" />
+                        class="w-full px-4 py-2 border focus:outline-none"
+                        required />
                 </div>
                 <?php if (isset($errors) && !empty($errors['password_confirmation'])): ?>
                     <?= loadPartial('formErrorMsg', [
@@ -66,7 +70,7 @@
                     Register
                 </button>
             </form>
-            
+
         </div>
     </div>
 </div>

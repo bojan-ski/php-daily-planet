@@ -5,6 +5,11 @@ declare(strict_types=1);
 // import autoload
 require __DIR__ . '/vendor/autoload.php';
 
+// import & insatiate session
+use Framework\Session;
+
+Session::start();
+
 // import & insatiate router
 use Framework\Router;
 

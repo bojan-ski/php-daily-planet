@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
 use Framework\Database;
 use Exception;
+use Framework\Session;
 
 class UserController extends Database
 {
@@ -86,7 +89,7 @@ class UserController extends Database
             return;
         }
 
-        // store new user in db
+        // if all is good -> store new user in db
         (array) $newUser = [
             'name' => $name,
             'email' => $email,
@@ -101,6 +104,17 @@ class UserController extends Database
             ErrorController::randomError('Error while creating account');
             return;
         }
+
+        // get id of new user
+        $newUserId = $this->db->conn->lastInsertId();
+
+        // store new user in session
+        Session::set('user', [
+            'id' => $newUserId,
+            'name' => $name,
+            'email' => $email,
+            'role' => 'reader'
+        ]);  
 
         //redirect user 
         redirectUser('/');
