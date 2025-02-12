@@ -11,7 +11,7 @@
     <?php else: ?>
         <section class="articles-list mt-5 mb-3">
             <h4 class="text-5xl capitalize text-center font-semibold mb-3">
-                All News
+                <?= $pageTitle ?>
             </h4>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 p-5">

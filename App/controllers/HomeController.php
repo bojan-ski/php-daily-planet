@@ -20,7 +20,7 @@ class HomeController extends Database
     public function latestArticles(): void
     {
         try {
-            (array) $articles = $this->db->dbQuery("SELECT * FROM articles ORDER BY created_at DESC LIMIT 3")->fetchAll();
+            (array) $articles = $this->db->dbQuery("SELECT * FROM articles WHERE `status` = 'active' ORDER BY created_at DESC LIMIT 3")->fetchAll();
 
             loadView('home', [
                 'articles' => $articles

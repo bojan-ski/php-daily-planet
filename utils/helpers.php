@@ -46,8 +46,10 @@ function checkContent(string $content): string
 function isString(string $formData, int $min, int $max): bool
 {
     if(!empty($formData) && is_string($formData)){
-        $formDataValue = trim($formData);
+        $formDataValue = filter_var(trim($formData), FILTER_SANITIZE_SPECIAL_CHARS);
         $formDataLength = strlen($formDataValue);
+
+        // inspect($formDataLength);
 
         return $formDataLength >= $min && $formDataLength <= $max;
     }
@@ -83,7 +85,7 @@ function doesMatch(string $formDataOne, string $formDataTwo): bool
 };
 
 // FORMAT DATE
-function formateData(string $date): string{
+function formateDate(string $date): string{
     return date("d.m.Y", strtotime($date));
 }
 

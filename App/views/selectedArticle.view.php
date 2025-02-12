@@ -33,12 +33,8 @@
             <?= isset($selectedArticleAuthor['name']) ? checkContent($selectedArticleAuthor['name']) : '' ?>
         </p>
         <p>
-            <span class="font-semibold">Category:</span>
-            <?= isset($selectedArticle['category']) ? checkContent($selectedArticle['category']) : '' ?>
-        </p>
-        <p>
             <span class="font-semibold">Published:</span>
-            <?= isset($selectedArticle['created_at']) ? formateData(checkContent($selectedArticle['created_at'])) : '' ?>
+            <?= isset($selectedArticle['created_at']) ? formateDate(checkContent($selectedArticle['created_at'])) : '' ?>
         </p>
     </div>
 </div>

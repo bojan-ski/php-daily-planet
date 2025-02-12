@@ -17,14 +17,15 @@ class ArticlesController extends Database
         $this->db = new Database($config);
     }
 
-    // DISPLAY ALL ARTICLEs - articles page
+    // DISPLAY ALL ACTIVE ARTICLES - articles page
     public function displayArticlesPage(): void
     {
         try {
-            (array) $articles = $this->db->dbQuery("SELECT * FROM articles ORDER BY created_at DESC")->fetchAll();
+            (array) $articles = $this->db->dbQuery("SELECT * FROM articles WHERE `status` = 'active' ORDER BY created_at DESC")->fetchAll();
 
             loadView('articles', [
-                'articles' => $articles
+                'articles' => $articles,
+                'pageTitle' => 'All News'
             ]);
         } catch (Exception $e) {
             ErrorController::randomError('Error while retrieving articles');

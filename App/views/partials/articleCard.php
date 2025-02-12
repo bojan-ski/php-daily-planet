@@ -8,12 +8,8 @@
 
     <div class="mb-5">
         <p>
-            <span class="font-semibold">Category:</span>
-            <?= isset($article['category']) ? checkContent($article['category']) : '' ?>
-        </p>
-        <p>
             <span class="font-semibold">Published:</span>
-            <?= isset($article['section_two']) ? formateData(checkContent($article['created_at'])) : '' ?>
+            <?= isset($article['section_two']) ? formateDate(checkContent($article['created_at'])) : '' ?>
         </p>
     </div>
     <a href="/articles/<?= $article['id'] ?>" class="block w-full text-center px-5 py-2.5 border font-medium hover:bg-gray-200">
