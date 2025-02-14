@@ -43,8 +43,8 @@ header .app-name h1 {
 }
 
 /* NAVBAR */
-nav a {
-  font-size: 18px !important;
+nav .nav-link {
+  font-size: 18px;
 }
 
 /* MAIN */
