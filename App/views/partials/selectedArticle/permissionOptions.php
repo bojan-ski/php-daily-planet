@@ -8,14 +8,14 @@ use Framework\HasPermission;
     <div class="flex align-center">
 
         <?php if (HasPermission::editOption($selectedArticle['status'], $selectedArticle['user_id'])): ?>
-            <a class="block px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white mr-3" href="/articles">
+            <a class="block px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white mr-3" href="/articles/edit/<?= $selectedArticle['id'] ?>">
                 Edit
             </a>
         <?php endif; ?>
 
         <?php if (HasPermission::approveOption($selectedArticle['status'])): ?>
             <form method="POST">
-                <input type="hidden" name="_method" value="DELETE">
+                <input type="hidden" name="_method" value="PUT">
                 <button type="submit" class="block px-4 py-2 bg-green-500 hover:bg-green-600 text-white mr-3">
                     Approve
                 </button>

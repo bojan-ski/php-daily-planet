@@ -21,25 +21,31 @@ class ManageArticlesController extends ArticlesController
         ];
     }
 
-    // DISPLAY ALL AUTHOR ACTIVE ARTICLES PAGE
-    public function displayMyActiveArticlesPage(): void
+    // DISPLAY ALL AUTHOR ACTIVE ARTICLES PAGE - author user
+    public function displayAuthorActiveArticlesPage(): void
     {
         $this->fetchArticles("`status` = 'active' AND `user_id` = :id", 'My active articles', $this->userId);
     }
 
-    // DISPLAY ALL AUTHOR PENDING ARTICLES PAGE
-    public function displayMyPendingArticlesPage(): void
+    // DISPLAY ALL AUTHOR PENDING ARTICLES PAGE - author user
+    public function displayAuthorPendingArticlesPage(): void
     {
         $this->fetchArticles("`status` = 'pending' AND `user_id` = :id", 'My pending articles', $this->userId);
     }
 
-    // DISPLAY SUBMIT NEW ARTICLE PAGE
+    // DISPLAY ALL PENDING ARTICLES PAGE - admin user
+    public function displayAllPendingArticlesPage(): void
+    {
+        $this->fetchArticles("`status` = 'pending'", 'All pending articles');
+    }
+
+    // DISPLAY SUBMIT NEW ARTICLE PAGE - author user
     public function displaySubmitNewArticlePage(): void
     {
         loadView('authorUser/submitNewArticle');
     }
 
-    // SUBMIT NEW ARTICLE METHOD
+    // SUBMIT NEW ARTICLE METHOD - author user
     public function submitArticle(): void
     {
         (string) $title = isset($_POST['title']) ? $_POST['title'] : '';
@@ -107,15 +113,29 @@ class ManageArticlesController extends ArticlesController
         redirectUser('/my_pending_articles');
     }
 
-    // approve ARTICLE METHOD
-    public function approveSelectedArticle(array $params): void {
+    // approve ARTICLE METHOD - admin user
+    public function approveSelectedArticle(array $params): void
+    {
         (array) $selectedArticle = $this->fetchSelectedArticle($params);
-        
-        inspectAndDie($selectedArticle);
+
+        if (HasPermission::approveOption($selectedArticle['status'])) {
+            try {
+                $this->db->dbQuery("UPDATE articles SET `status` = 'active' WHERE id = :id", $params);
+            } catch (Exception $e) {
+                ErrorController::randomError();
+                return;
+            }
+
+            // MESSAGE - SELECTED ARTICLE APPROVED
+        } else {
+            // MESSAGE - YOU ARE NOT ALLOWED TO APPROVE THE ARTICLE
+        }
+
+        //redirect user 
+        redirectUser('/pending_articles');
     }
 
-
-    // DELETE ARTICLE METHOD
+    // DELETE ARTICLE METHOD - author & admin user
     public function deleteSelectedArticle(array $params): void
     {
         (array) $selectedArticle = $this->fetchSelectedArticle($params);

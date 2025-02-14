@@ -96,6 +96,15 @@ function redirectUser(string $url): void
     exit();
 }
 
+// DESTRUCTURE PAGE URI
+function getPagePaths(): array
+{
+    $uri = $_SERVER['REQUEST_URI'];
+    $parts = explode('/', trim($uri, '/'));
+
+    return $parts;
+}
+
 // INSPECT DATA
 function inspect(mixed $value): void
 {
