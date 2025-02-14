@@ -29,12 +29,16 @@ h6 {
   font-family: "Times New Roman", Times, serif;
 }
 
-button:active{
+button:active {
   transform: scale(0.99);
 }
 
-textarea{
+textarea {
   resize: none;
+}
+
+p {
+  text-align: justify;
 }
 
 /* HEADER */
@@ -53,7 +57,7 @@ main {
 }
 
 /* SUBMIT ARTICLE PAGE */
-.submit-article-page .select-options{
+.submit-article-page .select-options {
   max-width: 250px;
 }
 

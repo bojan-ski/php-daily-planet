@@ -21,3 +21,6 @@ $router->get('/my_active_articles', 'ManageArticlesController', 'displayMyActive
 $router->get('/my_pending_articles', 'ManageArticlesController', 'displayMyPendingArticlesPage');
 $router->get('/submit_article', 'ManageArticlesController', 'submitNewArticlePage');
 $router->post('/submit_article/submitArticle', 'ManageArticlesController', 'submitArticle');
+
+// ----- AUTHOR USER & ADMIN USER -----
+$router->delete('/articles/{id}', 'ManageArticlesController', 'deleteSelectedArticle');

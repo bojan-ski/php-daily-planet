@@ -46,6 +46,10 @@ class Router
         // inspect($method);
         // inspectAndDie($this->routes);
 
+        if($method == "POST" && isset($_POST['_method'])){
+            $method = strtoupper($_POST['_method']);
+        }
+
         foreach ($this->routes as $route) {
             // inspect($route);
 

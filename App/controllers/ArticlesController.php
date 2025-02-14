@@ -17,7 +17,8 @@ class ArticlesController extends Database
         $this->db = new Database($config);
     }
 
-    protected function fetchArticles(string $updatedQuery, string $pageTitle, array $params = [])
+    // FETCH ARTICLES - can be used in multiple class methods
+    protected function fetchArticles(string $updatedQuery, string $pageTitle, array $params = []): void
     {
         try {
             (array) $articles = $this->db->dbQuery("SELECT * FROM articles WHERE {$updatedQuery} ORDER BY created_at DESC", $params)->fetchAll();
@@ -28,36 +29,43 @@ class ArticlesController extends Database
             ]);
         } catch (Exception $e) {
             ErrorController::randomError('Error while retrieving articles');
+            exit;
         }
     }
 
-    // DISPLAY ALL ACTIVE ARTICLES - articles page
-    public function displayArticlesPage(): void
-    {
-        $this->fetchArticles("`status` = 'active'", 'All News');
-    }
-
-    // DISPLAY SELECTED ARTICLE - selected article page
-    public function displaySelectedArticlePage(array $params): void
+    // FETCH SELECTED ARTICLE - can be used in multiple class methods
+    protected function fetchSelectedArticle(array $params): array
     {
         // get selected article
         (string) $id = $params['id'] ?? '';
-        (array) $params = [
+        (array) $articleId = [
             'id' => $id
         ];
 
         try {
-            (array) $selectedArticle = $this->db->dbQuery("SELECT * FROM articles WHERE id = :id", $params)->fetch();
+            return $this->db->dbQuery("SELECT * FROM articles WHERE id = :id", $articleId)->fetch();
         } catch (Exception $e) {
             ErrorController::randomError();
-            return;
+            exit;
         }
 
         // display not found if selected article does not exist
         if (!$selectedArticle) {
             ErrorController::notFound();
-            return;
+            exit;
         };
+    }
+
+    // DISPLAY ALL ACTIVE ARTICLES PAGE
+    public function displayArticlesPage(): void
+    {
+        $this->fetchArticles("`status` = 'active'", 'All News');
+    }
+
+    // DISPLAY SELECTED ARTICLE PAGE
+    public function displaySelectedArticlePage(array $params): void
+    {
+        (array) $selectedArticle = $this->fetchSelectedArticle($params);
 
         /// get selected article - author
         (array) $authorParams = [

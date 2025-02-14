@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use Exception;
+use Framework\HasPermission;
 use Framework\Session;
 
 class ManageArticlesController extends ArticlesController
@@ -22,23 +23,25 @@ class ManageArticlesController extends ArticlesController
 
     // -- AUTHOR USER --
 
-    // DISPLAY ALL ACTIVE ARTICLES
+    // DISPLAY ALL AUTHOR ACTIVE ARTICLES PAGE
     public function displayMyActiveArticlesPage(): void
     {
-        $this->fetchArticles("`status` = 'active' AND `user_id` = :id", 'My active articles', $this->userId);        
+        $this->fetchArticles("`status` = 'active' AND `user_id` = :id", 'My active articles', $this->userId);
     }
 
-    // DISPLAY ALL PENDING ARTICLES
+    // DISPLAY ALL AUTHOR PENDING ARTICLES PAGE
     public function displayMyPendingArticlesPage(): void
     {
         $this->fetchArticles("`status` = 'pending' AND `user_id` = :id", 'My pending articles', $this->userId);
     }
 
+    // DISPLAY SUBMIT NEW ARTICLE PAGE
     public function submitNewArticlePage(): void
     {
         loadView('authorUser/submitNewArticle');
     }
 
+    // SUBMIT NEW ARTICLE METHOD
     public function submitArticle(): void
     {
         (string) $title = isset($_POST['title']) ? $_POST['title'] : '';
@@ -100,9 +103,32 @@ class ManageArticlesController extends ArticlesController
             return;
         }
 
+        // MESSAGE - ARTICLE SUBMITTED
+
         //redirect user 
         redirectUser('/my_pending_articles');
     }
+
+    // DELETE ARTICLE METHOD
+    public function deleteSelectedArticle(array $params): void
+    {
+        (array) $selectedArticle = $this->fetchSelectedArticle($params);
+
+        if (HasPermission::isAllowed($selectedArticle['user_id'])) {
+            try {
+                $this->db->dbQuery("DELETE FROM articles WHERE id = :id", $params);
+            } catch (Exception $e) {
+                ErrorController::randomError();
+                return;
+            }
+
+            // MESSAGE - SELECTED ARTICLE DELETED
+
+        } else {
+            // MESSAGE - YOU ARE NOT ALLOWED TO DELETE THE ARTICLE
+        }
+
+        //redirect user 
+        redirectUser('/articles');
+    }
 }
-
-
