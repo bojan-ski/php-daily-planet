@@ -3,9 +3,17 @@
 <?php loadPartial('navbar'); ?>
 
 <div class="submit-article-page container mx-auto">
-    <!-- WORK ON -->
-    <section class="select-options border mt-10 mb-10">
-        select-options
+    <section class="select-options mt-10 mb-5">
+        <div class="form-control">
+            <label class="label cursor-pointer">
+                <span class="label-text font-bold">Content - section 2</span>
+                <input type="checkbox" class="toggle select-option-one" checked="checked" />
+            </label>
+            <label class="label cursor-pointer">
+                <span class="label-text font-bold">Content - section 3</span>
+                <input type="checkbox" class="toggle select-option-two" checked="checked" />
+            </label>
+        </div>
     </section>
 
     <section class="new-article mb-10">
@@ -64,7 +72,7 @@
                 <textarea
                     name="section_two"
                     placeholder="Content - section two"
-                    class="w-full px-4 py-2 border focus:outline-none"
+                    class="section_two w-full px-4 py-2 border focus:outline-none"
                     rows="10"
                     minlength="500"
                     maxlength="2000"><?= $newArticle['section_two'] ?? '' ?></textarea>
@@ -78,7 +86,7 @@
                 <textarea
                     name="section_three"
                     placeholder="Content - section three"
-                    class="w-full px-4 py-2 border focus:outline-none"
+                    class="section_three w-full px-4 py-2 border focus:outline-none"
                     rows="10"
                     minlength="500"
                     maxlength="2000"><?= $newArticle['section_three'] ?? '' ?></textarea>
@@ -88,9 +96,8 @@
                     'error' => $errors['section_three']
                 ]) ?>
             <?php endif; ?>
-
             <button
-                type="submit" class="w-full bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 focus:outline-none">
+                type="submit" class="w-full rounded-md bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 focus:outline-none">
                 Login
             </button>
         </form>

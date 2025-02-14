@@ -6,6 +6,8 @@
     </p>
 </footer>
 
+<script src="/public/js/submitArticleSelectOptions.js"></script>
+
 </body>
 
 </html>

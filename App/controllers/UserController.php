@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use Framework\Database;
-use Exception;
 use Framework\Session;
+use Exception;
 
 class UserController extends Database
 {
-    protected $db;
+    protected Database $db;
 
     public function __construct()
     {

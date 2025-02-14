@@ -9,7 +9,7 @@ use Exception;
 
 class ArticlesController extends Database
 {
-    protected $db;
+    protected Database $db;
 
     public function __construct()
     {
@@ -17,19 +17,24 @@ class ArticlesController extends Database
         $this->db = new Database($config);
     }
 
-    // DISPLAY ALL ACTIVE ARTICLES - articles page
-    public function displayArticlesPage(): void
+    protected function fetchArticles(string $updatedQuery, string $pageTitle, array $params = [])
     {
         try {
-            (array) $articles = $this->db->dbQuery("SELECT * FROM articles WHERE `status` = 'active' ORDER BY created_at DESC")->fetchAll();
+            (array) $articles = $this->db->dbQuery("SELECT * FROM articles WHERE {$updatedQuery} ORDER BY created_at DESC", $params)->fetchAll();
 
             loadView('articles', [
                 'articles' => $articles,
-                'pageTitle' => 'All News'
+                'pageTitle' => $pageTitle
             ]);
         } catch (Exception $e) {
             ErrorController::randomError('Error while retrieving articles');
         }
+    }
+
+    // DISPLAY ALL ACTIVE ARTICLES - articles page
+    public function displayArticlesPage(): void
+    {
+        $this->fetchArticles("`status` = 'active'", 'All News');
     }
 
     // DISPLAY SELECTED ARTICLE - selected article page
@@ -63,7 +68,7 @@ class ArticlesController extends Database
             (array) $selectedArticleAuthor = $this->db->dbQuery("SELECT DISTINCT `name` FROM users WHERE id = :user_id", $authorParams)->fetch();
         } catch (Exception $e) {
             $selectedArticleAuthor = '';
-        }      
+        }
 
         // display page - view
         loadView('selectedArticle', [

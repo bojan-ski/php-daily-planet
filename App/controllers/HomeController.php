@@ -9,7 +9,7 @@ use Framework\Database;
 
 class HomeController extends Database
 {
-    protected $db;
+    protected Database $db;
 
     public function __construct()
     {
