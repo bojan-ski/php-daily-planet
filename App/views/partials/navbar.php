@@ -31,11 +31,11 @@ use Framework\Session;
                     Articles
                 </a>
                 <?php if (Session::exist('user') && Session::get('user')['role'] == 'reader'): ?>
-                    <?php loadPartial('navLinks/reader'); ?>
+                    <?php loadPartial('navbar/reader'); ?>
                 <?php elseif (Session::exist('user') && Session::get('user')['role'] == 'author'): ?>
-                    <?php loadPartial('navLinks/author'); ?>
+                    <?php loadPartial('navbar/author'); ?>
                 <?php elseif (Session::exist('user') && Session::get('user')['role'] == 'admin'): ?>
-                    <?php loadPartial('navLinks/admin'); ?>
+                    <?php loadPartial('navbar/admin'); ?>
                 <?php endif; ?>
             </div>
         </div>
@@ -49,11 +49,11 @@ use Framework\Session;
             Articles
         </a>
         <?php if (Session::exist('user') && Session::get('user')['role'] == 'reader'): ?>
-            <?php loadPartial('navLinks/reader'); ?>
+            <?php loadPartial('navbar/reader'); ?>
         <?php elseif (Session::exist('user') && Session::get('user')['role'] == 'author'): ?>
-            <?php loadPartial('navLinks/author'); ?>
+            <?php loadPartial('navbar/author'); ?>
         <?php elseif (Session::exist('user') && Session::get('user')['role'] == 'admin'): ?>
-            <?php loadPartial('navLinks/admin'); ?>
+            <?php loadPartial('navbar/admin'); ?>
         <?php endif; ?>
     </div>
 </nav>

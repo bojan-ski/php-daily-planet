@@ -21,8 +21,6 @@ class ManageArticlesController extends ArticlesController
         ];
     }
 
-    // -- AUTHOR USER --
-
     // DISPLAY ALL AUTHOR ACTIVE ARTICLES PAGE
     public function displayMyActiveArticlesPage(): void
     {
@@ -36,7 +34,7 @@ class ManageArticlesController extends ArticlesController
     }
 
     // DISPLAY SUBMIT NEW ARTICLE PAGE
-    public function submitNewArticlePage(): void
+    public function displaySubmitNewArticlePage(): void
     {
         loadView('authorUser/submitNewArticle');
     }
@@ -108,6 +106,14 @@ class ManageArticlesController extends ArticlesController
         //redirect user 
         redirectUser('/my_pending_articles');
     }
+
+    // approve ARTICLE METHOD
+    public function approveSelectedArticle(array $params): void {
+        (array) $selectedArticle = $this->fetchSelectedArticle($params);
+        
+        inspectAndDie($selectedArticle);
+    }
+
 
     // DELETE ARTICLE METHOD
     public function deleteSelectedArticle(array $params): void

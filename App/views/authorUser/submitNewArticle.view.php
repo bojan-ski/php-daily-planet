@@ -97,8 +97,8 @@
                 ]) ?>
             <?php endif; ?>
             <button
-                type="submit" class="w-full rounded-md bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 focus:outline-none">
-                Login
+                type="submit" class="uppercase w-full rounded-md bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 focus:outline-none">
+                Submit
             </button>
         </form>
     </section>

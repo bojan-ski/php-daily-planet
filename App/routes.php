@@ -19,8 +19,13 @@ $router->post('/logout', 'UserController', 'logout');
 // ----- AUTHOR USER -----
 $router->get('/my_active_articles', 'ManageArticlesController', 'displayMyActiveArticlesPage');
 $router->get('/my_pending_articles', 'ManageArticlesController', 'displayMyPendingArticlesPage');
-$router->get('/submit_article', 'ManageArticlesController', 'submitNewArticlePage');
+$router->get('/submit_article', 'ManageArticlesController', 'displaySubmitNewArticlePage');
 $router->post('/submit_article/submitArticle', 'ManageArticlesController', 'submitArticle');
 
 // ----- AUTHOR USER & ADMIN USER -----
+$router->get('/articles/edit/{id}', 'ManageArticlesController', 'displayEditSelectedArticlePage');
+$router->put('/articles/{id}', 'ManageArticlesController', 'editSelectedArticlePage');
 $router->delete('/articles/{id}', 'ManageArticlesController', 'deleteSelectedArticle');
+
+// ----- ADMIN USER -----
+$router->put('/articles/{id}', 'ManageArticlesController', 'approveSelectedArticle');

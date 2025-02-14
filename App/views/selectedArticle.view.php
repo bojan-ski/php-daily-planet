@@ -1,8 +1,3 @@
-<?php
-
-use Framework\HasPermission;
-
-?>
 <?php loadPartial('head'); ?>
 <?php loadPartial('header'); ?>
 <?php loadPartial('navbar'); ?>
@@ -14,20 +9,9 @@ use Framework\HasPermission;
             Back
         </a>
 
-        <?php if (HasPermission::isAllowed($selectedArticle['user_id'])): ?>
-            <div class="flex align-center">
-                <a class="block px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white mr-3" href="/articles">
-                    Edit
-                </a>
-
-                <form action="" method="POST">
-                    <input type="hidden" name="_method" value="DELETE">
-                    <button type="submit" class="block px-4 py-2 bg-red-500 hover:bg-red-600 text-white">
-                        Delete
-                    </button>
-                </form>
-            </div>
-        <?php endif; ?>
+        <?php loadPartial('selectedArticle/permissionOptions' , [
+            'selectedArticle' => $selectedArticle
+        ]); ?>
     </div>
 
     <div class="mb-3">
