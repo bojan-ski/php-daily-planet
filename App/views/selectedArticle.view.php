@@ -5,7 +5,7 @@
 <div class="selected-article-page container mx-auto">
 
     <div class="mt-10 mb-5 flex align-center justify-between">
-        <a class="block px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white" href="/articles">
+        <a class="back-btn block px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white">
             Back
         </a>
 
