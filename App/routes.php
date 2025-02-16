@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
+$pageUri = getPagePaths()[0];
+
 // ----- GENERAL - ALL USERS -----
 // article/articles
 $router->get('/', 'HomeController', 'latestArticles');
 $router->get('/articles', 'ArticlesController', 'displayArticlesPage');
-$router->get('/articles/{id}', 'ArticlesController', 'displaySelectedArticlePage');
+$router->get("/{$pageUri}/{id}", 'ArticlesController', 'displaySelectedArticlePage');
 // auth - sign up
 $router->get('/sign_up', 'UserController', 'displaySignUpPage');
 $router->post('/sign_up/register', 'UserController', 'register');
@@ -23,10 +25,10 @@ $router->get('/submit_article', 'ManageArticlesController', 'displaySubmitNewArt
 $router->post('/submit_article/submitArticle', 'ManageArticlesController', 'submitArticle');
 
 // ----- AUTHOR USER & ADMIN USER -----
-$router->get('/articles/edit/{id}', 'ManageArticlesController', 'displayEditSelectedArticlePage');
-$router->put('/articles/edit/{id}', 'ManageArticlesController', 'editSelectedArticle');
-$router->delete('/articles/{id}', 'ManageArticlesController', 'deleteSelectedArticle');
+$router->get("/{$pageUri}/edit/{id}", 'ManageArticlesController', 'displayEditSelectedArticlePage');
+$router->put("/{$pageUri}/edit/{id}", 'ManageArticlesController', 'editSelectedArticle');
+$router->delete("/{$pageUri}/{id}", 'ManageArticlesController', 'deleteSelectedArticle');
 
 // ----- ADMIN USER -----
 $router->get('/pending_articles', 'ManageArticlesController', 'displayAllPendingArticlesPage');
-$router->put('/articles/{id}', 'ManageArticlesController', 'approveSelectedArticle');
+$router->put("/pending_articles/{id}", 'ManageArticlesController', 'approveSelectedArticle');

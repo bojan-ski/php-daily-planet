@@ -8,7 +8,7 @@
             Edit Article
         </h2>
 
-        <form method="POST" action="/articles/edit/<?= $selectedArticle['id'] ?>">
+        <form method="POST" action="/<?= getPagePaths()[0] ?>/edit/<?= $selectedArticle['id'] ?>">
             <input type="hidden" name="_method" value="PUT">
             <div class="mb-4 text-center">
                 <input
@@ -18,8 +18,7 @@
                     class="text-center w-full md:w-2/3 lg:w-1/2 px-4 py-2 border-b focus:outline-none"
                     minlength="5"
                     maxlength="25"
-                    value="<?= $selectedArticle['title'] ?? '' ?>"
-                     />
+                    value="<?= $selectedArticle['title'] ?? '' ?>" />
             </div>
             <?php if (isset($errors) && !empty($errors['title'])): ?>
                 <?= loadPartial('formErrorMsg', [
@@ -33,8 +32,7 @@
                     class="w-full px-4 py-2 border focus:outline-none"
                     rows="3"
                     minlength="50"
-                    maxlength="250"
-                    ><?= $selectedArticle['description'] ?? '' ?></textarea>
+                    maxlength="250"><?= $selectedArticle['description'] ?? '' ?></textarea>
             </div>
             <?php if (isset($errors) && !empty($errors['description'])): ?>
                 <?= loadPartial('formErrorMsg', [
@@ -48,8 +46,7 @@
                     class="w-full px-4 py-2 border focus:outline-none"
                     rows="10"
                     minlength="500"
-                    maxlength="2000"
-                    ><?= $selectedArticle['section_one'] ?? '' ?></textarea>
+                    maxlength="2000"><?= $selectedArticle['section_one'] ?? '' ?></textarea>
             </div>
             <?php if (isset($errors) && !empty($errors['section_one'])): ?>
                 <?= loadPartial('formErrorMsg', [

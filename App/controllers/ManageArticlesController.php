@@ -11,6 +11,7 @@ use Framework\Session;
 class ManageArticlesController extends ArticlesController
 {
     private array $userId;
+    private string $backPath;
 
     public function __construct()
     {
@@ -19,6 +20,7 @@ class ManageArticlesController extends ArticlesController
         $this->userId = [
             'id' => Session::get('user')['id']
         ];
+        $this->backPath = getPagePaths()[0];
     }
 
     // DISPLAY ALL AUTHOR ACTIVE ARTICLES PAGE - author user
@@ -141,7 +143,6 @@ class ManageArticlesController extends ArticlesController
         // get selected article - data
         (array) $selectedArticle = $this->fetchSelectedArticle($params);
 
-
         // display page - view
         loadView('authorAndAdminUser/editSelectedArticle', [
             'selectedArticle' => $selectedArticle
@@ -211,7 +212,8 @@ class ManageArticlesController extends ArticlesController
             'description' => $description,
             'section_one' => $section_one,
             'section_two' => $section_two,
-            'section_three' => $section_three
+            'section_three' => $section_three,
+            'created_at' => date("Y-m-d h:i:s")
         ];
 
         $updateArticleQuery = "UPDATE articles 
@@ -219,7 +221,8 @@ class ManageArticlesController extends ArticlesController
                 description = :description, 
                 section_one = :section_one, 
                 section_two = :section_two, 
-                section_three = :section_three 
+                section_three = :section_three,
+                created_at = :created_at
             WHERE id = :id";
 
         try {
@@ -232,7 +235,7 @@ class ManageArticlesController extends ArticlesController
         // MESSAGE - ARTICLE SUBMITTED
 
         //redirect user 
-        redirectUser('/articles');
+        redirectUser("/$this->backPath");
     }
 
     // DELETE ARTICLE METHOD - author & admin user
@@ -256,6 +259,6 @@ class ManageArticlesController extends ArticlesController
         }
 
         //redirect user 
-        redirectUser('/articles');
+        redirectUser("/$this->backPath");
     }
 }

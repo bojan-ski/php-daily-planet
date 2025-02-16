@@ -45,7 +45,7 @@
                     class="w-full px-4 py-2 border focus:outline-none"
                     rows="3"
                     minlength="50"
-                    maxlength="250"
+                    maxlength="240"
                     required><?= $newArticle['description'] ?? '' ?></textarea>
             </div>
             <?php if (isset($errors) && !empty($errors['description'])): ?>

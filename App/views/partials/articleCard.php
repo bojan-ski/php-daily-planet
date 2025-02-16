@@ -12,7 +12,7 @@
             <?= isset($article['section_two']) ? formateDate(checkContent($article['created_at'])) : '' ?>
         </p>
     </div>
-    <a href="/articles/<?= $article['id'] ?>" class="block w-full text-center px-5 py-2.5 border font-medium hover:bg-gray-200">
+    <a href="/<?= getPagePaths()[0] . '/' . $article['id'] ?>" class="block w-full text-center px-5 py-2.5 border font-medium hover:bg-gray-200">
         Details
     </a>
 </div>
