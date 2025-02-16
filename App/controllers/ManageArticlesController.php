@@ -135,9 +135,29 @@ class ManageArticlesController extends ArticlesController
         redirectUser('/pending_articles');
     }
 
+    // DISPLAY EDIT ARTICLE PAGE - author & admin user
+    public function displayEditSelectedArticlePage(array $params): void
+    {
+        // get selected article - data
+        (array) $selectedArticle = $this->fetchSelectedArticle($params);
+
+
+        // display page - view
+        loadView('authorAndAdminUser/editSelectedArticle', [
+            'selectedArticle' => $selectedArticle
+        ]);
+    }
+
+    // EDIT ARTICLE METHOD - author & admin user
+    public function editSelectedArticle(): void
+    {
+        inspectAndDie('editSelectedArticle');
+    }
+
     // DELETE ARTICLE METHOD - author & admin user
     public function deleteSelectedArticle(array $params): void
     {
+        // get selected article - data
         (array) $selectedArticle = $this->fetchSelectedArticle($params);
 
         if (HasPermission::isAllowed($selectedArticle['user_id'])) {
