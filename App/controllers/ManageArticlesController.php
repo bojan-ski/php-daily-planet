@@ -149,9 +149,90 @@ class ManageArticlesController extends ArticlesController
     }
 
     // EDIT ARTICLE METHOD - author & admin user
-    public function editSelectedArticle(): void
+    public function editSelectedArticle(array $params): void
     {
-        inspectAndDie('editSelectedArticle');
+        // get selected article - data
+        (array) $selectedArticle = $this->fetchSelectedArticle($params);
+
+        // check if user has permission to edit
+        if (!HasPermission::editOption($selectedArticle['status'], $selectedArticle['user_id'])) {
+            // MESSAGE - YOU ARE NOT ALLOWED TO DELETE THE ARTICLE
+
+            //redirect user 
+            redirectUser('/articles');
+            return;
+        }
+
+        // if user has permission to edit
+        (string) $title = isset($_POST['title']) ? $_POST['title'] : '';
+        (string) $description = isset($_POST['description']) ? $_POST['description'] : '';
+        (string) $section_one = isset($_POST['section_one']) ? $_POST['section_one'] : '';
+        (string) $section_two = isset($_POST['section_two']) ? $_POST['section_two'] : null;
+        (string) $section_three = isset($_POST['section_three']) ? $_POST['section_three'] : null;
+
+        // check form data & display error if exist
+        $errors = [];
+
+        if (!isString($title, 5, 25)) {
+            $errors['title'] = 'Please provide a valid title, between 5 and 25 characters';
+        }
+        if (!isString($description, 50, 250)) {
+            $errors['description'] = 'Please provide a valid description, between 50 and 250 characters.';
+        }
+        if (!isString($section_one, 500, 2000)) {
+            $errors['section_one'] = 'Please provide valid article content, between 500 and 2000 characters.';
+        }
+        if ($section_two && !isString($section_two, 500, 2000)) {
+            $errors['section_two'] = 'Please provide valid article content, between 500 and 2000 characters.';
+        }
+        if ($section_three && !isString($section_three, 500, 2000)) {
+            $errors['section_three'] = 'Please provide valid article content, between 500 and 2000 characters.';
+        }
+
+        if (!empty($errors)) {
+            loadView('authorAndAdminUser/editSelectedArticle', [
+                'errors' => $errors,
+                'selectedArticle' => [
+                    'id' => $selectedArticle['id'],
+                    'title' => $title,
+                    'description' => $description,
+                    'section_one' => $section_one,
+                    'section_two' => $section_two,
+                    'section_three' => $section_three
+                ]
+            ]);
+            return;
+        }
+
+        // if all is good -> submit edited article -> update article in db
+        (array) $updatedSelectedArticle = [
+            'id' => $selectedArticle['id'],
+            'title' => $title,
+            'description' => $description,
+            'section_one' => $section_one,
+            'section_two' => $section_two,
+            'section_three' => $section_three
+        ];
+
+        $updateArticleQuery = "UPDATE articles 
+            SET title = :title, 
+                description = :description, 
+                section_one = :section_one, 
+                section_two = :section_two, 
+                section_three = :section_three 
+            WHERE id = :id";
+
+        try {
+            $this->db->dbQuery($updateArticleQuery, $updatedSelectedArticle);
+        } catch (Exception $e) {
+            ErrorController::randomError('Error while editing article');
+            return;
+        }
+
+        // MESSAGE - ARTICLE SUBMITTED
+
+        //redirect user 
+        redirectUser('/articles');
     }
 
     // DELETE ARTICLE METHOD - author & admin user

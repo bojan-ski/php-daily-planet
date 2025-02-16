@@ -24,7 +24,7 @@ $router->post('/submit_article/submitArticle', 'ManageArticlesController', 'subm
 
 // ----- AUTHOR USER & ADMIN USER -----
 $router->get('/articles/edit/{id}', 'ManageArticlesController', 'displayEditSelectedArticlePage');
-$router->put('/articles/edit', 'ManageArticlesController', 'editSelectedArticle');
+$router->put('/articles/edit/{id}', 'ManageArticlesController', 'editSelectedArticle');
 $router->delete('/articles/{id}', 'ManageArticlesController', 'deleteSelectedArticle');
 
 // ----- ADMIN USER -----

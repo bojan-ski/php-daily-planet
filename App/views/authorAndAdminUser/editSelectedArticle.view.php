@@ -8,7 +8,8 @@
             Edit Article
         </h2>
 
-        <form method="POST" action="/articles/edit/editSelectedArticle">
+        <form method="POST" action="/articles/edit/<?= $selectedArticle['id'] ?>">
+            <input type="hidden" name="_method" value="PUT">
             <div class="mb-4 text-center">
                 <input
                     type="text"
@@ -18,7 +19,7 @@
                     minlength="5"
                     maxlength="25"
                     value="<?= $selectedArticle['title'] ?? '' ?>"
-                    required />
+                     />
             </div>
             <?php if (isset($errors) && !empty($errors['title'])): ?>
                 <?= loadPartial('formErrorMsg', [
@@ -33,7 +34,7 @@
                     rows="3"
                     minlength="50"
                     maxlength="250"
-                    required><?= $selectedArticle['description'] ?? '' ?></textarea>
+                    ><?= $selectedArticle['description'] ?? '' ?></textarea>
             </div>
             <?php if (isset($errors) && !empty($errors['description'])): ?>
                 <?= loadPartial('formErrorMsg', [
@@ -48,7 +49,7 @@
                     rows="10"
                     minlength="500"
                     maxlength="2000"
-                    required><?= $selectedArticle['section_one'] ?? '' ?></textarea>
+                    ><?= $selectedArticle['section_one'] ?? '' ?></textarea>
             </div>
             <?php if (isset($errors) && !empty($errors['section_one'])): ?>
                 <?= loadPartial('formErrorMsg', [
