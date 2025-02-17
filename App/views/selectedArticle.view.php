@@ -17,7 +17,8 @@ use Framework\Session;
         <?php if (Session::exist('user')): ?>
             <?php if (Session::get('user')['role'] == 'reader'): ?>
                 <?php loadPartial('selectedArticle/bookmarkOption', [
-                    'selectedArticle' => $selectedArticle
+                    'selectedArticle' => $selectedArticle,
+                    'articleBookmarked' => $articleBookmarked
                 ]); ?>
             <?php else: ?>
                 <?php loadPartial('selectedArticle/permissionOptions', [

@@ -33,27 +33,30 @@ class ReaderUserController extends Database
             ]);
         } else {
             ErrorController::randomError('You are not logged in!');
-            return;
+            exit;
         }
     }
 
-    public function bookmarkSelectedArticle($params): void
+    public function bookmarkSelectedArticle(array $params): void
     {
-        (array) $bookmarkParams = [
-            'user_id' => Session::get('user')['id'],
-            'article_id' => $params['id']
-        ];
+        (string) $userId = Session::get('user')['id'] ?? '';
+        (string) $articleId = $params['id'] ?? '';
 
         // check if article is bookmarked
+        (array) $bookmarkParams = [
+            'user_id' => $userId,
+            'article_id' => $articleId
+        ];
+
         try {
             (array) $isBookmarked = $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams)->fetch();
         } catch (Exception $e) {
             ErrorController::randomError('');
-            return;
+            exit;
         }
-        
+
         // if bookmarked
-        if($isBookmarked){   
+        if ($isBookmarked) {
             // MESSAGE - ARTICLE IS BOOKMARKED DELETED
 
             //redirect user 
@@ -63,8 +66,8 @@ class ReaderUserController extends Database
 
         // if not bookmarked
         (array) $newBookmark = [
-            'user_id' => Session::get('user')['id'],
-            'article_id' => $params['id'],
+            'user_id' => $userId,
+            'article_id' => $articleId,
             'created_at' => date("Y-m-d h:i:s")
         ];
 
@@ -77,7 +80,7 @@ class ReaderUserController extends Database
             redirectUser('/articles/' . $params['id']);
         } catch (Exception $e) {
             ErrorController::randomError('There was an error while bookmarking the article');
-            return;
+            exit;
         }
     }
 
@@ -93,7 +96,7 @@ class ReaderUserController extends Database
                 // delete account from db
                 $this->db->dbQuery("DELETE FROM users WHERE id = :id", $userId);
 
-                // delete user data from session from db
+                // delete user data from session
                 Session::clearAll();
 
                 // MESSAGE - ACCOUNT DELETED
@@ -102,11 +105,11 @@ class ReaderUserController extends Database
                 redirectUser("/");
             } catch (Exception $e) {
                 ErrorController::randomError('User does not exist');
-                return;
+                exit;
             }
         } else {
             ErrorController::randomError('You not able to perform the following action!');
-            return;
+            exit;
         }
     }
 }
