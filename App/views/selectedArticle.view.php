@@ -1,3 +1,9 @@
+<?php
+
+use Framework\Session;
+
+?>
+
 <?php loadPartial('head'); ?>
 <?php loadPartial('header'); ?>
 <?php loadPartial('navbar'); ?>
@@ -8,9 +14,17 @@
             Back
         </a>
 
-        <?php loadPartial('selectedArticle/permissionOptions', [
-            'selectedArticle' => $selectedArticle
-        ]); ?>
+        <?php if (Session::exist('user')): ?>
+            <?php if (Session::get('user')['role'] == 'reader'): ?>
+                <?php loadPartial('selectedArticle/bookmarkOption', [
+                    'selectedArticle' => $selectedArticle
+                ]); ?>
+            <?php else: ?>
+                <?php loadPartial('selectedArticle/permissionOptions', [
+                    'selectedArticle' => $selectedArticle
+                ]); ?>
+            <?php endif ?>
+        <?php endif ?>
     </div>
 
     <div class="mb-3">

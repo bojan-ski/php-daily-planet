@@ -4,9 +4,9 @@ namespace Framework;
 
 class HasPermission
 {
-    public static function isAllowed(int $articleId): bool
+    public static function isAllowed(int $articleCreatedByUserId): bool
     {
-        if (Session::exist('user') && (Session::get('user')['role'] == 'admin' || (Session::get('user')['role'] == 'author' && Session::get('user')['id'] == $articleId))) {
+        if (Session::exist('user') && (Session::get('user')['role'] == 'admin' || (Session::get('user')['role'] == 'author' && Session::get('user')['id'] == $articleCreatedByUserId))) {
             return true;
         }
         return false;
@@ -20,11 +20,11 @@ class HasPermission
         return false;
     }
 
-    public static function editOption(string $status, int $articleId): bool
+    public static function editOption(string $status, int $articleCreatedByUserId): bool
     {
         if ($status == 'active' && (Session::exist('user') && Session::get('user')['role'] == 'admin')) {
             return true;
-        } elseif ($status == 'pending' && (Session::get('user')['role'] == 'author' && Session::get('user')['id'] == $articleId)) {
+        } elseif ($status == 'pending' && (Session::get('user')['role'] == 'author' && Session::get('user')['id'] == $articleCreatedByUserId)) {
             return true;
         } else {
             return false;

@@ -21,6 +21,7 @@ $router->post('/logout', 'UserController', 'logout');
 // ----- READER USER -----
 $router->get('/profile', 'ReaderUserController', 'displayReaderProfilePage');
 $router->delete('/profile', 'ReaderUserController', 'deleteAccount');
+$router->post("/articles/{id}", 'ReaderUserController', 'bookmarkSelectedArticle');
 
 // ----- AUTHOR USER -----
 $router->get('/my_active_articles', 'ManageArticlesController', 'displayAuthorActiveArticlesPage');

@@ -18,16 +18,70 @@ class ReaderUserController extends Database
         $this->db = new Database($config);
     }
 
-    public function displayReaderProfilePage()
+    public function displayReaderProfilePage(): void
     {
-        $user = Session::get('user');
+        // get user from session
+        (array) $user = Session::get('user');
 
-        loadView('readerUser/profile', [
-            'user' => $user
-        ]);
+        if (isset($user)) {
+            $bookmarkedArticles = [];
+
+            // load view
+            loadView('readerUser/profile', [
+                'user' => $user,
+                'bookmarkedArticles' => $bookmarkedArticles
+            ]);
+        } else {
+            ErrorController::randomError('You are not logged in!');
+            return;
+        }
     }
 
-    public function deleteAccount()
+    public function bookmarkSelectedArticle($params): void
+    {
+        (array) $bookmarkParams = [
+            'user_id' => Session::get('user')['id'],
+            'article_id' => $params['id']
+        ];
+
+        // check if article is bookmarked
+        try {
+            (array) $isBookmarked = $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams)->fetch();
+        } catch (Exception $e) {
+            ErrorController::randomError('');
+            return;
+        }
+        
+        // if bookmarked
+        if($isBookmarked){   
+            // MESSAGE - ARTICLE IS BOOKMARKED DELETED
+
+            //redirect user 
+            redirectUser('/articles');
+            // redirectUser('/articles/' . $params['id']);
+        }
+
+        // if not bookmarked
+        (array) $newBookmark = [
+            'user_id' => Session::get('user')['id'],
+            'article_id' => $params['id'],
+            'created_at' => date("Y-m-d h:i:s")
+        ];
+
+        try {
+            $this->db->dbQuery("INSERT INTO bookmarked (`user_id`, `article_id`, `created_at`) VALUES (:user_id, :article_id, :created_at)", $newBookmark);
+
+            // MESSAGE - ARTICLE BOOKMARKED
+
+            //redirect user 
+            redirectUser('/articles/' . $params['id']);
+        } catch (Exception $e) {
+            ErrorController::randomError('There was an error while bookmarking the article');
+            return;
+        }
+    }
+
+    public function deleteAccount(): void
     {
         // get reader user id
         (array) $userId = [
