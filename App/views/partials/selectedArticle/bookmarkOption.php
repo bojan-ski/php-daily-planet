@@ -1,7 +1,7 @@
 <div class="bookmark-option">
     <?php if ($articleBookmarked): ?>
-        <input type="hidden" name="_method" value="DELETE">
         <form method="POST">
+            <input type="hidden" name="_method" value="DELETE">
             <button type="submit" class="block px-4 py-2 bg-red-500 hover:bg-red-600 text-white mr-3">
                 Remove Bookmark
             </button>

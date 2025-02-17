@@ -37,7 +37,7 @@ class ReaderUserController extends Database
         }
     }
 
-    public function bookmarkSelectedArticle(array $params): void
+    public function bookmarkFeature(array $params): void
     {
         (string) $userId = Session::get('user')['id'] ?? '';
         (string) $articleId = $params['id'] ?? '';
@@ -51,36 +51,42 @@ class ReaderUserController extends Database
         try {
             (array) $isBookmarked = $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams)->fetch();
         } catch (Exception $e) {
-            ErrorController::randomError('');
+            ErrorController::randomError();
             exit;
         }
 
         // if bookmarked
         if ($isBookmarked) {
-            // MESSAGE - ARTICLE IS BOOKMARKED DELETED
+            try {
+                $this->db->dbQuery("DELETE FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams);
 
-            //redirect user 
-            redirectUser('/articles');
-            // redirectUser('/articles/' . $params['id']);
-        }
+                // MESSAGE - BOOKMARKED REMOVED DELETED
 
-        // if not bookmarked
-        (array) $newBookmark = [
-            'user_id' => $userId,
-            'article_id' => $articleId,
-            'created_at' => date("Y-m-d h:i:s")
-        ];
+                //redirect user 
+                redirectUser('/articles/' . $params['id']);
+            } catch (Exception $e) {
+                ErrorController::randomError('There was an error while removing the bookmark');
+                exit;
+            }
+        } else {
+            // if not bookmarked
+            (array) $newBookmark = [
+                'user_id' => $userId,
+                'article_id' => $articleId,
+                'created_at' => date("Y-m-d h:i:s")
+            ];
 
-        try {
-            $this->db->dbQuery("INSERT INTO bookmarked (`user_id`, `article_id`, `created_at`) VALUES (:user_id, :article_id, :created_at)", $newBookmark);
+            try {
+                $this->db->dbQuery("INSERT INTO bookmarked (`user_id`, `article_id`, `created_at`) VALUES (:user_id, :article_id, :created_at)", $newBookmark);
 
-            // MESSAGE - ARTICLE BOOKMARKED
+                // MESSAGE - ARTICLE BOOKMARKED
 
-            //redirect user 
-            redirectUser('/articles/' . $params['id']);
-        } catch (Exception $e) {
-            ErrorController::randomError('There was an error while bookmarking the article');
-            exit;
+                //redirect user 
+                redirectUser('/articles/' . $params['id']);
+            } catch (Exception $e) {
+                ErrorController::randomError('There was an error while bookmarking the article');
+                exit;
+            }
         }
     }
 
