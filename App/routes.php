@@ -18,6 +18,10 @@ $router->post('/sign_in/login', 'UserController', 'login');
 // auth - log out
 $router->post('/logout', 'UserController', 'logout');
 
+// ----- READER USER -----
+$router->get('/profile', 'ReaderUserController', 'displayReaderProfilePage');
+$router->delete('/profile', 'ReaderUserController', 'deleteAccount');
+
 // ----- AUTHOR USER -----
 $router->get('/my_active_articles', 'ManageArticlesController', 'displayAuthorActiveArticlesPage');
 $router->get('/my_pending_articles', 'ManageArticlesController', 'displayAuthorPendingArticlesPage');
