@@ -39,6 +39,37 @@ class ManageAppUsersController extends Database
         ]);
     }
 
+    public function removeAuthor(): void
+    {
+        if (Session::exist('user') && Session::get('user')['role'] == 'admin') {
+            // get author user id
+            (array) $authorId = [
+                'id' => $_POST['author_id'] ?? null
+            ];
+
+            if (isset($authorId['id'])) {
+                try {
+                    // delete author user from db
+                    $this->db->dbQuery("DELETE FROM users WHERE id = :id", $authorId);
+
+                    // MESSAGE - AUTHOR REMOVED
+
+                    //redirect user 
+                    redirectUser("/authors");
+                } catch (Exception $e) {
+                    ErrorController::randomError('Author does not exist');
+                    exit;
+                }
+            } else {
+                ErrorController::randomError();
+                exit;
+            }
+        } else {
+            ErrorController::randomError('You not able to perform the following action!');
+            exit;
+        }
+    }
+
     public function displayReadersPage(): void
     {
         // get all reader users

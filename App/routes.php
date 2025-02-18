@@ -39,4 +39,5 @@ $router->delete("/{$pageUri}/{id}", 'ManageArticlesController', 'deleteSelectedA
 $router->get('/pending_articles', 'ManageArticlesController', 'displayAllPendingArticlesPage');
 $router->put('/pending_articles/{id}', 'ManageArticlesController', 'approveSelectedArticle');
 $router->get('/authors', 'ManageAppUsersController', 'displayAuthorsPage');
+$router->delete('/authors', 'ManageAppUsersController', 'removeAuthor');
 $router->get('/readers', 'ManageAppUsersController', 'displayReadersPage');
