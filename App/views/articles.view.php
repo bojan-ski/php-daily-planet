@@ -3,12 +3,7 @@
 <?php loadPartial('navbar'); ?>
 
 <div class="articles-page container mx-auto">
-
-    <?php if (empty(isset($articles))): ?>
-        <h2 class="text-6xl text-center font-semibold mt-20">
-            No news available
-        </h2>
-    <?php else: ?>
+    <?php if (isset($articles) && !empty($articles)): ?>
         <section class="articles-list mt-5 mb-3">
             <h4 class="text-5xl capitalize text-center font-semibold mb-3">
                 <?= $pageTitle ?>
@@ -26,8 +21,11 @@
         <section class="mb-5">
             pagination
         </section>
+    <?php else: ?>
+        <h2 class="text-6xl text-center font-semibold mt-20">
+            No news available
+        </h2>
     <?php endif ?>
-
 </div>
 
 <?php loadPartial('footer'); ?>

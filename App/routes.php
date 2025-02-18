@@ -10,19 +10,19 @@ $router->get('/', 'HomeController', 'latestArticles');
 $router->get('/articles', 'ArticlesController', 'displayArticlesPage');
 $router->get("/{$pageUri}/{id}", 'ArticlesController', 'displaySelectedArticlePage');
 // auth - sign up
-$router->get('/sign_up', 'UserController', 'displaySignUpPage');
-$router->post('/sign_up/register', 'UserController', 'register');
+$router->get('/sign_up', 'AuthController', 'displaySignUpPage');
+$router->post('/sign_up/register', 'AuthController', 'register');
 // auth - sign in
-$router->get('/sign_in', 'UserController', 'displaySignInPage');
-$router->post('/sign_in/login', 'UserController', 'login');
+$router->get('/sign_in', 'AuthController', 'displaySignInPage');
+$router->post('/sign_in/login', 'AuthController', 'login');
 // auth - log out
-$router->post('/logout', 'UserController', 'logout');
+$router->post('/logout', 'AuthController', 'logout');
 
 // ----- READER USER -----
 $router->get('/profile', 'ReaderUserController', 'displayReaderProfilePage');
 $router->delete('/profile', 'ReaderUserController', 'deleteAccount');
-$router->post("/articles/{id}", 'ReaderUserController', 'bookmarkFeature');
-$router->delete("/articles/{id}", 'ReaderUserController', 'bookmarkFeature');
+$router->post("/{$pageUri}/{id}", 'ReaderUserController', 'bookmarkFeature');
+$router->delete("/{$pageUri}/{id}", 'ReaderUserController', 'bookmarkFeature');
 
 // ----- AUTHOR USER -----
 $router->get('/my_active_articles', 'ManageArticlesController', 'displayAuthorActiveArticlesPage');

@@ -24,12 +24,46 @@ class ReaderUserController extends Database
         (array) $user = Session::get('user');
 
         if (isset($user)) {
-            $bookmarkedArticles = [];
+            // get all bookmarked articles (ids) from bookmarked table 
+            (array) $userId = [
+                'id' => Session::get('user')['id']
+            ];
+
+            try {
+                (array) $bookmarkedArticlesIds = $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :id", $userId)->fetchAll();
+            } catch (Exception $e) {
+                ErrorController::randomError('There was an error while displaying user bookmarked articles');
+                exit;
+            }
+
+            // if reader user has bookmarked articles
+            if($bookmarkedArticlesIds){
+                // Extract all article_id
+                (array) $articleIds = array_column($bookmarkedArticlesIds, "article_id");
+    
+                // get all bookmarked articles from articles table
+                $placeholders = [];
+                $params = [];
+                foreach ($articleIds as $index => $id) {
+                    $key = "id$index";
+                    $placeholders[] = ":$key";
+                    $params[$key] = $id;
+                }
+    
+                $query = "SELECT * FROM articles WHERE id IN (" . implode(', ', $placeholders) . ")";
+    
+                try {
+                    (array) $bookmarkedArticles = $this->db->dbQuery($query, $params)->fetchAll();
+                } catch (Exception $e) {
+                    ErrorController::randomError('There was an error while displaying user bookmarked articles');
+                    exit;
+                }
+            }
 
             // load view
             loadView('readerUser/profile', [
                 'user' => $user,
-                'bookmarkedArticles' => $bookmarkedArticles
+                'bookmarkedArticles' => $bookmarkedArticles ?? ''
             ]);
         } else {
             ErrorController::randomError('You are not logged in!');
@@ -55,6 +89,9 @@ class ReaderUserController extends Database
             exit;
         }
 
+        // back path 
+        $pageUri = getPagePaths()[0];
+
         // if bookmarked
         if ($isBookmarked) {
             try {
@@ -63,7 +100,7 @@ class ReaderUserController extends Database
                 // MESSAGE - BOOKMARKED REMOVED DELETED
 
                 //redirect user 
-                redirectUser('/articles/' . $params['id']);
+                redirectUser("/{$pageUri}/" . $params['id']);
             } catch (Exception $e) {
                 ErrorController::randomError('There was an error while removing the bookmark');
                 exit;
@@ -82,7 +119,7 @@ class ReaderUserController extends Database
                 // MESSAGE - ARTICLE BOOKMARKED
 
                 //redirect user 
-                redirectUser('/articles/' . $params['id']);
+                redirectUser("/{$pageUri}/" . $params['id']);
             } catch (Exception $e) {
                 ErrorController::randomError('There was an error while bookmarking the article');
                 exit;

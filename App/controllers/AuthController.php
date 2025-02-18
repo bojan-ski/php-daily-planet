@@ -8,7 +8,7 @@ use Framework\Database;
 use Framework\Session;
 use Exception;
 
-class UserController extends Database
+class AuthController extends Database
 {
     protected Database $db;
 
