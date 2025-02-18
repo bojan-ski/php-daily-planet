@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use Framework\Database;
-use Exception;
 use Framework\Session;
+use Exception;
 
 class ArticlesController extends Database
 {
