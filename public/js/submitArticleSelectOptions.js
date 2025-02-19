@@ -1,12 +1,19 @@
+const selectOptionOne = document.querySelector('.select-option-one');
+const selectOptionTwo = document.querySelector('.select-option-two');
+
 const toggleSectionVisibility = (checkbox, sectionClass) => {
     document.querySelector(sectionClass).classList.toggle('hidden', !checkbox.checked);
     document.querySelector(sectionClass).classList.toggle('block', checkbox.checked);
 };
 
-document.querySelector('.select-option-one').addEventListener('change', e => {
-    toggleSectionVisibility(e.target, '.section_two');
-});
+if (selectOptionOne) {
+    selectOptionOne.addEventListener('change', e => {
+        toggleSectionVisibility(e.target, '.section_two');
+    });
+}
 
-document.querySelector('.select-option-two').addEventListener('change', e => {
-    toggleSectionVisibility(e.target, '.section_three');
-});
+if (selectOptionTwo) {
+    selectOptionOne.addEventListener('change', e => {
+        toggleSectionVisibility(e.target, '.section_three');
+    });
+}
