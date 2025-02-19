@@ -18,7 +18,7 @@ class ArticlesController extends Database
         $this->db = new Database($config);
     }
 
-    // FETCH ARTICLES - can be used in multiple class methods
+    // FETCH ARTICLES FROM DB - can be used in multiple class methods
     protected function fetchArticles(string $updatedQuery, string $pageTitle, array $params = []): void
     {
         try {
@@ -34,7 +34,7 @@ class ArticlesController extends Database
         }
     }
 
-    // FETCH SELECTED ARTICLE - can be used in multiple class methods
+    // FETCH SELECTED ARTICLE FROM DB - can be used in multiple class methods
     protected function fetchSelectedArticle(array $params): array
     {
         // get selected article
@@ -57,13 +57,11 @@ class ArticlesController extends Database
         };
     }
 
-    // DISPLAY ALL ACTIVE ARTICLES PAGE
     public function displayArticlesPage(): void
     {
         $this->fetchArticles("`status` = 'active'", 'All News');
     }
 
-    // DISPLAY SELECTED ARTICLE PAGE
     public function displaySelectedArticlePage(array $params): void
     {
         (array) $selectedArticle = $this->fetchSelectedArticle($params);
@@ -93,7 +91,7 @@ class ArticlesController extends Database
             try {
                 (array) $bookmarkedArticle = $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams)->fetch();
             } catch (Exception $e) {
-                ErrorController::randomError('');
+                ErrorController::randomError();
                 exit;
             }
 

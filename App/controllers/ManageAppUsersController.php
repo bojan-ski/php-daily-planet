@@ -18,6 +18,7 @@ class ManageAppUsersController extends Database
         $this->db = new Database($config);
     }
 
+    // FETCH USERS FROM DB - can be used in multiple class methods 
     private function fetchUsers(string $role, string $errorMessage): array | null
     {
         try {
@@ -35,7 +36,7 @@ class ManageAppUsersController extends Database
 
         // load view
         loadView('/adminUser/authors', [
-            'authorUsers' => $authorUsers ?? ''
+            'authorUsers' => $authorUsers
         ]);
     }
 
@@ -52,7 +53,10 @@ class ManageAppUsersController extends Database
                     // delete author user from db
                     $this->db->dbQuery("DELETE FROM users WHERE id = :id", $authorId);
 
-                    // MESSAGE - AUTHOR REMOVED
+                    // store pop up msg in session
+                    Session::set('pop_up', [
+                        'message' => 'Author removed'
+                    ]);
 
                     //redirect user 
                     redirectUser("/authors");
@@ -65,7 +69,7 @@ class ManageAppUsersController extends Database
                 exit;
             }
         } else {
-            ErrorController::randomError('You not authorized to perform the following action!');
+            ErrorController::accessDenied();
             exit;
         }
     }
@@ -104,7 +108,7 @@ class ManageAppUsersController extends Database
                         'email' => $email
                     ]
                 ]);
-                return;
+                exit;
             }
 
             // check if email is taken
@@ -116,7 +120,7 @@ class ManageAppUsersController extends Database
                 (array) $emailTaken = $this->db->dbQuery("SELECT DISTINCT `email` FROM users WHERE email = :email", $emailParams)->fetch();
             } catch (Exception $e) {
                 ErrorController::randomError('Error while creating account');
-                return;
+                exit;
             }
 
             if (isset($emailTaken) && !empty($emailTaken['email'])) {
@@ -129,10 +133,10 @@ class ManageAppUsersController extends Database
                         'email' => $email
                     ]
                 ]);
-                return;
+                exit;
             }
 
-            // if all is good -> store new user in db
+            // if all is good -> store new author user in db
             (array) $newAuthorUser = [
                 'name' => $name,
                 'email' => $email,
@@ -145,13 +149,18 @@ class ManageAppUsersController extends Database
                 $this->db->dbQuery("INSERT INTO users (`name`, `email`, `password`, `created_at`, `role`) VALUES (:name, :email, :password, :created_at, :role)", $newAuthorUser);
             } catch (Exception $e) {
                 ErrorController::randomError('Error while creating account');
-                return;
+                exit;
             }
+
+            // store pop up msg in session
+            Session::set('pop_up', [
+                'message' => 'Author created'
+            ]);
 
             //redirect user 
             redirectUser('/authors');
         } else {
-            ErrorController::randomError('You not authorized to perform the following action!');
+            ErrorController::accessDenied();
             exit;
         }
     }
@@ -163,7 +172,7 @@ class ManageAppUsersController extends Database
 
         // load view
         loadView('/adminUser/readers', [
-            'readerUsers' => $readerUsers ?? ''
+            'readerUsers' => $readerUsers
         ]);
     }
 }

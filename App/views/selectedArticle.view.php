@@ -7,6 +7,7 @@ use Framework\Session;
 <?php loadPartial('head'); ?>
 <?php loadPartial('header'); ?>
 <?php loadPartial('navbar'); ?>
+<?php loadPartial('popUpMsg'); ?>
 
 <div class="selected-article-page container mx-auto">
     <div class="mt-10 mb-5 flex align-center justify-between">

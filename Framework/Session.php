@@ -37,7 +37,7 @@ class Session
         session_destroy();
     }
 
-    public static function displayPopUp(string $key): ?string
+    public static function displayPopUp(string $key): string | null
     {
         $message = self::get($key);
         $message = $message['message'] ?? null;

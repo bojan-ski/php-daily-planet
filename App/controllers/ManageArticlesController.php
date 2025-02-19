@@ -11,7 +11,7 @@ use Framework\Session;
 class ManageArticlesController extends ArticlesController
 {
     private array $userId;
-    private string $backPath;
+    public string $backPath;
 
     public function __construct()
     {
@@ -50,72 +50,80 @@ class ManageArticlesController extends ArticlesController
     // SUBMIT NEW ARTICLE METHOD - author user
     public function submitArticle(): void
     {
-        (string) $title = isset($_POST['title']) ? $_POST['title'] : '';
-        (string) $description = isset($_POST['description']) ? $_POST['description'] : '';
-        (string) $section_one = isset($_POST['section_one']) ? $_POST['section_one'] : '';
-        (string) $section_two = isset($_POST['section_two']) ? $_POST['section_two'] : null;
-        (string) $section_three = isset($_POST['section_three']) ? $_POST['section_three'] : null;
+        if (Session::exist('user') && Session::get('user')['role'] == 'author') {
+            (string) $title = isset($_POST['title']) ? $_POST['title'] : '';
+            (string) $description = isset($_POST['description']) ? $_POST['description'] : '';
+            (string) $section_one = isset($_POST['section_one']) ? $_POST['section_one'] : '';
+            $section_two = isset($_POST['section_two']) ? $_POST['section_two'] : null;
+            $section_three = isset($_POST['section_three']) ? $_POST['section_three'] : null;
 
-        // check form data & display error if exist
-        $errors = [];
+            // check form data & display error if exist
+            $errors = [];
 
-        if (!isString($title, 5, 25)) {
-            $errors['title'] = 'Please provide a valid title, between 5 and 25 characters';
-        }
-        if (!isString($description, 50, 250)) {
-            $errors['description'] = 'Please provide a valid description, between 50 and 250 characters.';
-        }
-        if (!isString($section_one, 500, 2000)) {
-            $errors['section_one'] = 'Please provide valid article content, between 500 and 2000 characters.';
-        }
-        if ($section_two && !isString($section_two, 500, 2000)) {
-            $errors['section_two'] = 'Please provide valid article content, between 500 and 2000 characters.';
-        }
-        if ($section_three && !isString($section_three, 500, 2000)) {
-            $errors['section_three'] = 'Please provide valid article content, between 500 and 2000 characters.';
-        }
+            if (!isString($title, 5, 25)) {
+                $errors['title'] = 'Please provide a valid title, between 5 and 25 characters';
+            }
+            if (!isString($description, 50, 250)) {
+                $errors['description'] = 'Please provide a valid description, between 50 and 250 characters.';
+            }
+            if (!isString($section_one, 500, 2000)) {
+                $errors['section_one'] = 'Please provide valid article content, between 500 and 2000 characters.';
+            }
+            if ($section_two && !isString($section_two, 500, 2000)) {
+                $errors['section_two'] = 'Please provide valid article content, between 500 and 2000 characters.';
+            }
+            if ($section_three && !isString($section_three, 500, 2000)) {
+                $errors['section_three'] = 'Please provide valid article content, between 500 and 2000 characters.';
+            }
 
-        if (!empty($errors)) {
-            loadView('authorUser/submitNewArticle', [
-                'errors' => $errors,
-                'newArticle' => [
-                    'title' => $title,
-                    'description' => $description,
-                    'section_one' => $section_one,
-                    'section_two' => $section_two,
-                    'section_three' => $section_three
-                ]
-            ]);
-            return;
-        }
+            if (!empty($errors)) {
+                loadView('authorUser/submitNewArticle', [
+                    'errors' => $errors,
+                    'newArticle' => [
+                        'title' => $title,
+                        'description' => $description,
+                        'section_one' => $section_one,
+                        'section_two' => $section_two,
+                        'section_three' => $section_three
+                    ]
+                ]);
+                exit;
+            }
 
-        // if all is good -> submit article -> store in db
-        (array) $newArticle = [
-            'title' => $title,
-            'description' => $description,
-            'section_one' => $section_one,
-            'section_two' => $section_two,
-            'section_three' => $section_three,
-            'created_at' => date("Y-m-d h:i:s"),
-            'user_id' => $this->userId['id'],
-            'status' => 'pending'
-        ];
+            // if all is good -> submit article -> store in db
+            (array) $newArticle = [
+                'title' => $title,
+                'description' => $description,
+                'section_one' => $section_one,
+                'section_two' => $section_two,
+                'section_three' => $section_three,
+                'created_at' => date("Y-m-d h:i:s"),
+                'user_id' => $this->userId['id'],
+                'status' => 'pending'
+            ];
 
-        try {
-            $this->db->dbQuery("INSERT INTO articles (`title`, `description`, `section_one`, `section_two`,
+            try {
+                $this->db->dbQuery("INSERT INTO articles (`title`, `description`, `section_one`, `section_two`,
             `section_three`, `created_at`, `user_id`, `status`) VALUES (:title, :description, :section_one, :section_two, :section_three, :created_at, :user_id, :status )", $newArticle);
-        } catch (Exception $e) {
-            ErrorController::randomError('Error while submitting article');
-            return;
+            } catch (Exception $e) {
+                ErrorController::randomError('Error while submitting article');
+                exit;
+            }
+
+            // store pop up msg in session
+            Session::set('pop_up', [
+                'message' => 'Article submitted'
+            ]);
+
+            //redirect user 
+            redirectUser('/my_pending_articles');
+        } else {
+            ErrorController::accessDenied();
+            exit;
         }
-
-        // MESSAGE - ARTICLE SUBMITTED
-
-        //redirect user 
-        redirectUser('/my_pending_articles');
     }
 
-    // approve ARTICLE METHOD - admin user
+    // APPROVE ARTICLE METHOD - admin user
     public function approveSelectedArticle(array $params): void
     {
         (array) $selectedArticle = $this->fetchSelectedArticle($params);
@@ -123,18 +131,22 @@ class ManageArticlesController extends ArticlesController
         if (HasPermission::approveOption($selectedArticle['status'])) {
             try {
                 $this->db->dbQuery("UPDATE articles SET `status` = 'active' WHERE id = :id", $params);
+
+                // store pop up msg in session
+                Session::set('pop_up', [
+                    'message' => 'Article approved'
+                ]);
+
+                //redirect user 
+                redirectUser('/pending_articles');
             } catch (Exception $e) {
                 ErrorController::randomError();
-                return;
+                exit;
             }
-
-            // MESSAGE - SELECTED ARTICLE APPROVED
         } else {
-            // MESSAGE - YOU ARE NOT ALLOWED TO APPROVE THE ARTICLE
+            ErrorController::accessDenied();
+            exit;
         }
-
-        //redirect user 
-        redirectUser('/pending_articles');
     }
 
     // DISPLAY EDIT ARTICLE PAGE - author & admin user
@@ -157,19 +169,16 @@ class ManageArticlesController extends ArticlesController
 
         // check if user has permission to edit
         if (!HasPermission::editOption($selectedArticle['status'], $selectedArticle['user_id'])) {
-            // MESSAGE - YOU ARE NOT ALLOWED TO DELETE THE ARTICLE
-
-            //redirect user 
-            redirectUser('/articles');
-            return;
+            ErrorController::accessDenied();
+            exit;
         }
 
         // if user has permission to edit
         (string) $title = isset($_POST['title']) ? $_POST['title'] : '';
         (string) $description = isset($_POST['description']) ? $_POST['description'] : '';
         (string) $section_one = isset($_POST['section_one']) ? $_POST['section_one'] : '';
-        (string) $section_two = isset($_POST['section_two']) ? $_POST['section_two'] : null;
-        (string) $section_three = isset($_POST['section_three']) ? $_POST['section_three'] : null;
+        $section_two = isset($_POST['section_two']) ? $_POST['section_two'] : null;
+        $section_three = isset($_POST['section_three']) ? $_POST['section_three'] : null;
 
         // check form data & display error if exist
         $errors = [];
@@ -202,7 +211,7 @@ class ManageArticlesController extends ArticlesController
                     'section_three' => $section_three
                 ]
             ]);
-            return;
+            exit;
         }
 
         // if all is good -> submit edited article -> update article in db
@@ -229,10 +238,13 @@ class ManageArticlesController extends ArticlesController
             $this->db->dbQuery($updateArticleQuery, $updatedSelectedArticle);
         } catch (Exception $e) {
             ErrorController::randomError('Error while editing article');
-            return;
+            exit;
         }
 
-        // MESSAGE - ARTICLE SUBMITTED
+        // store pop up msg in session
+        Session::set('pop_up', [
+            'message' => 'Article updated'
+        ]);
 
         //redirect user 
         redirectUser("/$this->backPath");
@@ -247,18 +259,21 @@ class ManageArticlesController extends ArticlesController
         if (HasPermission::isAllowed($selectedArticle['user_id'])) {
             try {
                 $this->db->dbQuery("DELETE FROM articles WHERE id = :id", $params);
+
+                // store pop up msg in session
+                Session::set('pop_up', [
+                    'message' => 'Article deleted'
+                ]);
+
+                //redirect user 
+                redirectUser("/$this->backPath");
             } catch (Exception $e) {
                 ErrorController::randomError();
-                return;
+                exit;
             }
-
-            // MESSAGE - SELECTED ARTICLE DELETED
-
         } else {
-            // MESSAGE - YOU ARE NOT ALLOWED TO DELETE THE ARTICLE
+            ErrorController::accessDenied();
+            exit;
         }
-
-        //redirect user 
-        redirectUser("/$this->backPath");
     }
 }

@@ -64,7 +64,7 @@ class AuthController extends Database
                     'email' => $email
                 ]
             ]);
-            return;
+            exit;
         }
 
         // check if email is taken
@@ -76,7 +76,7 @@ class AuthController extends Database
             (array) $emailTaken = $this->db->dbQuery("SELECT DISTINCT `email` FROM users WHERE email = :email", $emailParams)->fetch();
         } catch (Exception $e) {
             ErrorController::randomError('Error while creating account');
-            return;
+            exit;
         }
 
         if (isset($emailTaken) && !empty($emailTaken['email'])) {
@@ -89,7 +89,7 @@ class AuthController extends Database
                     'email' => $email
                 ]
             ]);
-            return;
+            exit;
         }
 
         // if all is good -> store new user in db
@@ -105,7 +105,7 @@ class AuthController extends Database
             $this->db->dbQuery("INSERT INTO users (`name`, `email`, `password`, `created_at`, `role`) VALUES (:name, :email, :password, :created_at, :role)", $newUser);
         } catch (Exception $e) {
             ErrorController::randomError('Error while creating account');
-            return;
+            exit;
         }
 
         // get id of new user
@@ -150,7 +150,7 @@ class AuthController extends Database
                     'email' => $email
                 ]
             ]);
-            return;
+            exit;
         }
 
         // check email
@@ -162,7 +162,7 @@ class AuthController extends Database
             (array) $user = $this->db->dbQuery("SELECT * FROM users WHERE email = :email", $emailParams)->fetch();
         } catch (Exception $e) {
             ErrorController::randomError('Error while login');
-            return;
+            exit;
         }
 
         if (!isset($user) || empty($user['email'])) {
@@ -172,7 +172,7 @@ class AuthController extends Database
                 'errors' => $errors,
             ]);
 
-            return;
+            exit;
         }
 
         // check password
@@ -183,7 +183,7 @@ class AuthController extends Database
                 'errors' => $errors
             ]);
 
-            return;
+            exit;
         }
 
         // store user in session
@@ -192,6 +192,11 @@ class AuthController extends Database
             'name' => $user['name'],
             'email' => $user['email'],
             'role' => $user['role']
+        ]);
+
+        // store pop up msg in session
+        Session::set('pop_up', [
+            'message' => 'You have logged in'
         ]);
 
         //redirect user 
