@@ -20,9 +20,9 @@ $router->post('/logout', 'AuthController', 'logout');
 
 // ----- READER USER -----
 $router->get('/profile', 'ReaderUserController', 'displayReaderProfilePage');
-$router->delete('/profile', 'ReaderUserController', 'deleteAccount');
-$router->post("/{$pageUri}/{id}", 'ReaderUserController', 'bookmarkFeature');
-$router->delete("/{$pageUri}/{id}", 'ReaderUserController', 'bookmarkFeature');
+$router->delete('/profile/deleteAccount', 'ReaderUserController', 'deleteAccount');
+$router->post("/{$pageUri}/{id}/bookmarkFeature", 'ReaderUserController', 'bookmarkFeature');
+$router->delete("/{$pageUri}/{id}/bookmarkFeature", 'ReaderUserController', 'bookmarkFeature');
 
 // ----- AUTHOR USER -----
 $router->get('/my_active_articles', 'ManageArticlesController', 'displayAuthorActiveArticlesPage');
@@ -32,12 +32,14 @@ $router->post('/submit_article/submitArticle', 'ManageArticlesController', 'subm
 
 // ----- AUTHOR USER & ADMIN USER -----
 $router->get("/{$pageUri}/edit/{id}", 'ManageArticlesController', 'displayEditSelectedArticlePage');
-$router->put("/{$pageUri}/edit/{id}", 'ManageArticlesController', 'editSelectedArticle');
-$router->delete("/{$pageUri}/{id}", 'ManageArticlesController', 'deleteSelectedArticle');
+$router->put("/{$pageUri}/edit/{id}/editSelectedArticle", 'ManageArticlesController', 'editSelectedArticle');
+$router->delete("/{$pageUri}/{id}/deleteSelectedArticle", 'ManageArticlesController', 'deleteSelectedArticle');
 
 // ----- ADMIN USER -----
 $router->get('/pending_articles', 'ManageArticlesController', 'displayAllPendingArticlesPage');
-$router->put('/pending_articles/{id}', 'ManageArticlesController', 'approveSelectedArticle');
+$router->put('/pending_articles/{id}/approveSelectedArticle', 'ManageArticlesController', 'approveSelectedArticle');
 $router->get('/authors', 'ManageAppUsersController', 'displayAuthorsPage');
-$router->delete('/authors', 'ManageAppUsersController', 'removeAuthor');
+$router->delete('/authors/removeAuthor', 'ManageAppUsersController', 'removeAuthor');
+$router->get('/add_author', 'ManageAppUsersController', 'displayAddAuthorPage');
+$router->post('/add_author/addAuthor', 'ManageAppUsersController', 'addAuthor');
 $router->get('/readers', 'ManageAppUsersController', 'displayReadersPage');

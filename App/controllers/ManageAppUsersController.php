@@ -65,7 +65,93 @@ class ManageAppUsersController extends Database
                 exit;
             }
         } else {
-            ErrorController::randomError('You not able to perform the following action!');
+            ErrorController::randomError('You not authorized to perform the following action!');
+            exit;
+        }
+    }
+
+    public function displayAddAuthorPage(): void
+    {
+        // load view
+        loadView('/adminUser/addAuthor');
+    }
+
+    public function addAuthor(): void
+    {
+        if (Session::exist('user') && Session::get('user')['role'] == 'admin') {
+            (string) $name = isset($_POST['name']) ? $_POST['name'] : '';
+            (string) $email = isset($_POST['email']) ? $_POST['email'] : '';
+            (string) $password = isset($_POST['password']) ? $_POST['password'] : '';
+
+            // check form data & display error if exist
+            $errors = [];
+
+            if (!isString($name, 2, 40)) {
+                $errors['name'] = 'Please provide a valid name, between 2 and 40 characters';
+            }
+            if (!isEmail($email)) {
+                $errors['email'] = 'Please provide a valid email.';
+            }
+            if (!isString($password, 2, 40)) {
+                $errors['password'] = 'Please provide a valid password, between 2 and 40 characters.';
+            }
+
+            if (!empty($errors)) {
+                loadView('/adminUser/addAuthor', [
+                    'errors' => $errors,
+                    'user' => [
+                        'name' => $name,
+                        'email' => $email
+                    ]
+                ]);
+                return;
+            }
+
+            // check if email is taken
+            (array) $emailParams = [
+                'email' => $email
+            ];
+
+            try {
+                (array) $emailTaken = $this->db->dbQuery("SELECT DISTINCT `email` FROM users WHERE email = :email", $emailParams)->fetch();
+            } catch (Exception $e) {
+                ErrorController::randomError('Error while creating account');
+                return;
+            }
+
+            if (isset($emailTaken) && !empty($emailTaken['email'])) {
+                $errors['email'] = 'Email your provided is in use.';
+
+                loadView('/adminUser/addAuthor', [
+                    'errors' => $errors,
+                    'user' => [
+                        'name' => $name,
+                        'email' => $email
+                    ]
+                ]);
+                return;
+            }
+
+            // if all is good -> store new user in db
+            (array) $newAuthorUser = [
+                'name' => $name,
+                'email' => $email,
+                'password' => password_hash($password, PASSWORD_BCRYPT),
+                'created_at' => date("Y-m-d h:i:s"),
+                'role' => 'author'
+            ];
+
+            try {
+                $this->db->dbQuery("INSERT INTO users (`name`, `email`, `password`, `created_at`, `role`) VALUES (:name, :email, :password, :created_at, :role)", $newAuthorUser);
+            } catch (Exception $e) {
+                ErrorController::randomError('Error while creating account');
+                return;
+            }
+
+            //redirect user 
+            redirectUser('/authors');
+        } else {
+            ErrorController::randomError('You not authorized to perform the following action!');
             exit;
         }
     }

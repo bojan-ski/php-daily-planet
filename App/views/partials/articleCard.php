@@ -9,7 +9,7 @@
     <div class="mb-5">
         <p>
             <span class="font-semibold">Published:</span>
-            <?= isset($article['section_two']) ? formateDate(checkContent($article['created_at'])) : '' ?>
+            <?= isset($article['created_at']) ? formateDate(checkContent($article['created_at'])) : '' ?>
         </p>
     </div>
     <a href="/<?= getPagePaths()[0] . '/' . $article['id'] ?>" class="block rounded-md w-full text-center px-5 py-2.5 border font-medium bg-gray-100 hover:bg-gray-200">

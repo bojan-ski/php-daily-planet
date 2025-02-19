@@ -26,7 +26,7 @@
                 <input
                     type="text"
                     name="title"
-                    placeholder="Title"
+                    placeholder="Title - max 25 chars"
                     class="text-center w-full md:w-2/3 lg:w-1/2 px-4 py-2 border-b focus:outline-none"
                     minlength="5"
                     maxlength="25"
@@ -41,7 +41,7 @@
             <div class="mb-4">
                 <textarea
                     name="description"
-                    placeholder="Description"
+                    placeholder="Description - max 250 chars"
                     class="w-full px-4 py-2 border focus:outline-none"
                     rows="3"
                     minlength="50"
@@ -56,7 +56,7 @@
             <div class="mb-4">
                 <textarea
                     name="section_one"
-                    placeholder="Content - section one"
+                    placeholder="Content - section one - max 2000 chars"
                     class="w-full px-4 py-2 border focus:outline-none"
                     rows="10"
                     minlength="500"
@@ -71,7 +71,7 @@
             <div class="mb-4">
                 <textarea
                     name="section_two"
-                    placeholder="Content - section two"
+                    placeholder="Content - section two - max 2000 chars"
                     class="section_two w-full px-4 py-2 border focus:outline-none"
                     rows="10"
                     minlength="500"
@@ -85,7 +85,7 @@
             <div class="mb-4">
                 <textarea
                     name="section_three"
-                    placeholder="Content - section three"
+                    placeholder="Content - section three - max 2000 chars"
                     class="section_three w-full px-4 py-2 border focus:outline-none"
                     rows="10"
                     minlength="500"

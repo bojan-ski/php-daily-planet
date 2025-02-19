@@ -115,9 +115,9 @@ class ReaderUserController extends Database
 
             try {
                 $this->db->dbQuery("INSERT INTO bookmarked (`user_id`, `article_id`, `created_at`) VALUES (:user_id, :article_id, :created_at)", $newBookmark);
-
+                
                 // MESSAGE - ARTICLE BOOKMARKED
-
+                
                 //redirect user 
                 redirectUser("/{$pageUri}/" . $params['id']);
             } catch (Exception $e) {

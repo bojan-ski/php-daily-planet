@@ -3,7 +3,7 @@
 <?php loadPartial('navbar'); ?>
 
 <div class="profile-page container mx-auto">
-    <section class="profile-data mt-10 border-b pb-2 mb-5">
+    <section class="profile-data border-b pb-2 my-10 ">
         <h2 class="text-4xl font-bold text-center mb-3">
             My profile data
         </h2>
@@ -19,9 +19,9 @@
                     </p>
                 </div>
 
-                <form method="POST">
+                <form method="POST" action="/profile/deleteAccount">
                     <input type="hidden" name="_method" value="DELETE">
-                    <button type="submit" class="block px-4 py-2 bg-red-500 hover:bg-red-600 text-white">
+                    <button type="submit" class="rounded-md block px-4 py-2 bg-red-500 hover:bg-red-600 text-white">
                         Delete account
                     </button>
                 </form>

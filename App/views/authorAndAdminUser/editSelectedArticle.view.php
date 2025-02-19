@@ -8,7 +8,7 @@
             Edit Article
         </h2>
 
-        <form method="POST" action="/<?= getPagePaths()[0] ?>/edit/<?= $selectedArticle['id'] ?>">
+        <form method="POST" action="/<?= getPagePaths()[0] ?>/edit/<?= $selectedArticle['id'] ?>/editSelectedArticle">
             <input type="hidden" name="_method" value="PUT">
             <div class="mb-4 text-center">
                 <input

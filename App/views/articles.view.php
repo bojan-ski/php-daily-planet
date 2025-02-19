@@ -4,8 +4,8 @@
 
 <div class="articles-page container mx-auto">
     <?php if (isset($articles) && !empty($articles)): ?>
-        <section class="articles-list mt-5 mb-3">
-            <h4 class="text-5xl capitalize text-center font-semibold mb-3">
+        <section class="articles-list mt-10 mb-3">
+            <h4 class="text-5xl capitalize text-center font-semibold mb-5">
                 <?= $pageTitle ?>
             </h4>
 
@@ -18,7 +18,7 @@
             </div>
         </section>
 
-        <section class="mb-5">
+        <section class="mb-10">
             pagination
         </section>
     <?php else: ?>

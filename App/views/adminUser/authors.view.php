@@ -3,8 +3,11 @@
 <?php loadPartial('navbar'); ?>
 
 <div class="app-authors-page container mx-auto">
+    
+    <?php loadPartial('addAuthor/authorsNav'); ?>
+
     <?php if (isset($authorUsers) && !empty($authorUsers)): ?>
-        <div class="overflow-x-auto my-10">
+        <section class="authors-list overflow-x-auto mb-10">
             <table class="table">
                 <thead>
                     <tr>
@@ -23,7 +26,7 @@
                             <td><?= $user['email'] ?></td>
                             <td><?= $user['created_at'] ?></td>
                             <td>
-                                <form method="POST">
+                                <form method="POST" action="/authors/removeAuthor">
                                     <input type="hidden" name="_method" value="DELETE">
                                     <input type="hidden" name="author_id" value="<?= $user['id'] ?>">
                                     <button type="submit" class="block rounded-md px-4 py-2 bg-red-500 hover:bg-red-600 text-white">
@@ -35,7 +38,7 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        </div>
+        </section>
     <?php else: ?>
         <h2 class="text-6xl text-center font-semibold mt-20">
             No reader users

@@ -42,7 +42,7 @@ use Framework\Session;
     </div>
 
     <div class="hidden lg:block">
-        <a href="/" class="nav-link btn btn-ghost text-7xl mx-7">
+        <a href="/" class="nav-link btn btn-ghost text-xl mx-7">
             Home
         </a>
         <a href="/articles" class="nav-link btn btn-ghost text-xl mx-7">

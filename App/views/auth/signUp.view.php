@@ -16,7 +16,7 @@
                         type="text"
                         name="name"
                         placeholder="Full Name"
-                        class="w-full px-4 py-2 border focus:outline-none"
+                        class="rounded-md w-full px-4 py-2 border focus:outline-none"
                         value="<?= $user['name'] ?? '' ?>"
                         required />
                 </div>
@@ -30,7 +30,7 @@
                         type="email"
                         name="email"
                         placeholder="Email Address"
-                        class="w-full px-4 py-2 border focus:outline-none"
+                        class="rounded-md w-full px-4 py-2 border focus:outline-none"
                         value="<?= $user['email'] ?? '' ?>"
                         required />
                 </div>
@@ -44,7 +44,7 @@
                         type="password"
                         name="password"
                         placeholder="Password"
-                        class="w-full px-4 py-2 border focus:outline-none"
+                        class="rounded-md w-full px-4 py-2 border focus:outline-none"
                         required />
                 </div>
                 <?php if (isset($errors) && !empty($errors['password'])): ?>
@@ -57,7 +57,7 @@
                         type="password"
                         name="password_confirmation"
                         placeholder="Confirm Password"
-                        class="w-full px-4 py-2 border focus:outline-none"
+                        class="rounded-md w-full px-4 py-2 border focus:outline-none"
                         required />
                 </div>
                 <?php if (isset($errors) && !empty($errors['password_confirmation'])): ?>
@@ -66,7 +66,7 @@
                     ]) ?>
                 <?php endif; ?>
                 <button
-                    type="submit" class="w-full bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 focus:outline-none">
+                    type="submit" class="rounded-md w-full bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 focus:outline-none">
                     Register
                 </button>
             </form>
