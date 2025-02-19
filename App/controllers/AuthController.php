@@ -119,6 +119,11 @@ class AuthController extends Database
             'role' => 'reader'
         ]);
 
+        // store pop up msg in session
+        Session::set('pop_up', [
+            'message' => 'Account created'
+        ]);
+
         //redirect user 
         redirectUser('/');
     }

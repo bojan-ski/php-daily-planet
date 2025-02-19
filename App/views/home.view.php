@@ -1,6 +1,7 @@
 <?php loadPartial('head'); ?>
 <?php loadPartial('header'); ?>
 <?php loadPartial('navbar'); ?>
+<?php loadPartial('popUpMsg'); ?>
 
 <div class="home-page container mx-auto">
     <!-- WORK ON -->
