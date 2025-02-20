@@ -42,7 +42,7 @@
         </section>
     <?php else: ?>
         <h2 class="text-6xl text-center font-semibold mt-20">
-            No reader users
+            No author users
         </h2>
     <?php endif ?>
 </div>

@@ -11,7 +11,6 @@ function basePath(string $path = ''): string
 // LOAD VIEW
 function loadView(string $name, $data = []): void
 {
-    // inspect($data);
     (string) $viewPath = basePath("App/views/{$name}.view.php");
 
     if (file_exists($viewPath)) {
@@ -25,7 +24,6 @@ function loadView(string $name, $data = []): void
 // LOAD PARTIAL
 function loadPartial(string $name, $data = []): void
 {
-    // inspect($data);
     (string) $partialPath = basePath("App/views/partials/{$name}.php");
 
     if (file_exists($partialPath)) {
@@ -48,8 +46,6 @@ function isString(string $formData, int $min, int $max): bool
     if(!empty($formData) && is_string($formData)){
         $formDataValue = filter_var(trim($formData), FILTER_SANITIZE_SPECIAL_CHARS);
         $formDataLength = strlen($formDataValue);
-
-        // inspect($formDataLength);
 
         return $formDataLength >= $min && $formDataLength <= $max;
     }

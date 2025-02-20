@@ -17,7 +17,7 @@
     <!-- custom css -->
     <link rel="stylesheet" href="../../public/css/style.css">
 
-    <title>Daily Planer</title>
+    <title>The Daily Planet</title>
 </head>
 
 <body>
