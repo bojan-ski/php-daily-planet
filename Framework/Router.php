@@ -5,47 +5,45 @@ declare(strict_types=1);
 namespace Framework;
 
 use App\Controllers\ErrorController;
+use Framework\Middleware\Authorization;
 
-class Router
+class Router extends Authorization
 {
     private $routes = [];
 
-    private function createRoute(string $method, string $uri, string $controller, string $controllerMethod): void
+    private function createRoute(string $method, string $uri, string $controller, string $controllerMethod, array $roles = []): void
     {
         $this->routes[] = [
             'method' => $method,
             'uri' => $uri,
             'controller' => $controller,
-            'controllerMethod' => $controllerMethod
+            'controllerMethod' => $controllerMethod,
+            'roles' => $roles
         ];
     }
 
-    public function get(string $uri, string $controller, string $controllerMethod): void
+    public function get(string $uri, string $controller, string $controllerMethod, array $roles = []): void
     {
-        $this->createRoute("GET", $uri, $controller, $controllerMethod);
+        $this->createRoute("GET", $uri, $controller, $controllerMethod, $roles);
     }
 
-    public function post(string $uri, string $controller, string $controllerMethod): void
+    public function post(string $uri, string $controller, string $controllerMethod, array $roles = []): void
     {
-        $this->createRoute("POST", $uri, $controller, $controllerMethod);
+        $this->createRoute("POST", $uri, $controller, $controllerMethod, $roles);
     }
 
-    public function put(string $uri, string $controller, string $controllerMethod): void
+    public function put(string $uri, string $controller, string $controllerMethod, array $roles = []): void
     {
-        $this->createRoute("PUT", $uri, $controller, $controllerMethod);
+        $this->createRoute("PUT", $uri, $controller, $controllerMethod, $roles);
     }
 
-    public function delete(string $uri, string $controller, string $controllerMethod): void
+    public function delete(string $uri, string $controller, string $controllerMethod, array $roles = []): void
     {
-        $this->createRoute("DELETE", $uri, $controller, $controllerMethod);
+        $this->createRoute("DELETE", $uri, $controller, $controllerMethod, $roles);
     }
 
     public function route(string $uri, string $method): void
     {
-        // inspect($uri);
-        // inspect($method);
-        // inspectAndDie($this->routes);
-
         if($method == "POST" && isset($_POST['_method'])){
             $method = strtoupper($_POST['_method']);
         }
@@ -54,9 +52,11 @@ class Router
             // inspect($route);
 
             (bool) $match = true;
+
             (array) $uriSegments = explode('/', trim($uri, '/'));
             // inspect($uriSegments);
             // inspectAndDie($uriSegments);
+
             (array) $routeSegments = explode('/', trim($route['uri'], '/'));
             // inspect($routeSegments);
 
@@ -77,6 +77,9 @@ class Router
                 }
 
                 if ($match) {
+                    // check user if user is logged in and check user role (check if user has authorization)
+                    $this->isAuthorized($route['roles']);
+
                     (string) $requestedController = 'App\\controllers\\' . $route['controller'];
                     (string) $requestedControllerMethod = $route['controllerMethod'];
 
