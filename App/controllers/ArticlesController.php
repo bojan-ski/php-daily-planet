@@ -22,7 +22,7 @@ class ArticlesController extends Database
     protected function fetchArticles(string $updatedQuery, string $pageTitle, array $params = []): void
     {
         try {
-            (array) $articles = $this->db->dbQuery("SELECT * FROM articles WHERE {$updatedQuery} ORDER BY created_at DESC", $params)->fetchAll();
+            $articles = $this->db->dbQuery("SELECT * FROM articles WHERE {$updatedQuery} ORDER BY created_at DESC", $params)->fetchAll();
 
             loadView('articles', [
                 'articles' => $articles,
@@ -60,6 +60,52 @@ class ArticlesController extends Database
     public function displayArticlesPage(): void
     {
         $this->fetchArticles("`status` = 'active'", 'All News');
+    }
+
+    public function searchArticle()
+    {
+        (string) $title = isset($_POST['article_title']) ? $_POST['article_title'] : '';
+
+        // check form data and display error
+        if (!isString($title, 2, 40)) {
+            // store pop up msg in session
+            Session::set('pop_up', [
+                'message' => 'Please provide a valid article title'
+            ]);
+
+            //redirect user 
+            redirectUser("/articles");
+        }
+
+        // if all is good
+        try {
+            $query = "SELECT * FROM articles WHERE title LIKE :title";
+            $params = [
+                'title' => "%{$title}%",
+            ];
+
+            $articles = $this->db->dbQuery($query, $params)->fetchAll();            
+        } catch (Exception $e) {
+            ErrorController::randomError('Error while retrieving articles');
+            exit;
+        }
+
+        // load view
+        if(empty($articles)){
+            // store pop up msg in session
+            Session::set('pop_up', [
+                'message' => 'There are articles based on search term'
+            ]);
+
+            //redirect user 
+            redirectUser("/articles");
+        }else{
+            loadView('articles', [
+                'articles' => $articles,
+                'pageTitle' => 'All News',
+                'search' => $title
+            ]);
+        }
     }
 
     public function displaySelectedArticlePage(array $params): void
