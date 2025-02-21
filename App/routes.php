@@ -9,6 +9,7 @@ $pageUri = getPagePaths()[0];
 $router->get('/', 'HomeController', 'latestArticles', ['guest', 'reader', 'author', 'admin']);
 $router->get('/articles', 'ArticlesController', 'displayArticlesPage', ['guest', 'reader', 'author', 'admin']);
 $router->post('/articles/search', 'ArticlesController', 'searchArticle', ['guest', 'reader', 'author', 'admin']);
+$router->post('/articles/loadMoreArticles', 'ArticlesController', 'loadMoreArticles', ['guest', 'reader', 'author', 'admin']);
 $router->get("/{$pageUri}/{id}", 'ArticlesController', 'displaySelectedArticlePage', ['guest', 'reader', 'author', 'admin']);
 // auth - sign up
 $router->get('/sign_up', 'AuthController', 'displaySignUpPage', ['guest']);

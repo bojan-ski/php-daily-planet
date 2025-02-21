@@ -26,19 +26,19 @@ class ManageArticlesController extends ArticlesController
     // DISPLAY ALL AUTHOR ACTIVE ARTICLES PAGE - author user
     public function displayAuthorActiveArticlesPage(): void
     {
-        $this->fetchArticles("`status` = 'active' AND `user_id` = :id", 'My active articles', $this->userId);
+        $this->fetchArticles("`status` = 'active' AND `user_id` = :id ORDER BY created_at DESC", 'My active articles', $this->userId);
     }
 
     // DISPLAY ALL AUTHOR PENDING ARTICLES PAGE - author user
     public function displayAuthorPendingArticlesPage(): void
     {
-        $this->fetchArticles("`status` = 'pending' AND `user_id` = :id", 'My pending articles', $this->userId);
+        $this->fetchArticles("`status` = 'pending' AND `user_id` = :id ORDER BY created_at DESC", 'My pending articles', $this->userId);
     }
 
     // DISPLAY ALL PENDING ARTICLES PAGE - admin user
     public function displayAllPendingArticlesPage(): void
     {
-        $this->fetchArticles("`status` = 'pending'", 'All pending articles');
+        $this->fetchArticles("`status` = 'pending' ORDER BY created_at DESC", 'All pending articles');
     }
 
     // DISPLAY SUBMIT NEW ARTICLE PAGE - author user

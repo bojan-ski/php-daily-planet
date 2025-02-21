@@ -8,6 +8,7 @@
 
 <script src="/public/js/submitArticleSelectOptions.js"></script>
 <script src="/public/js/closePopUpMsg.js"></script>
+<script src="/public/js/loadMoreArticles.js"></script>
 
 </body>
 

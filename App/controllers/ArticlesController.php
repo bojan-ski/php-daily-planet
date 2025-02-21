@@ -22,7 +22,7 @@ class ArticlesController extends Database
     protected function fetchArticles(string $updatedQuery, string $pageTitle, array $params = []): void
     {
         try {
-            $articles = $this->db->dbQuery("SELECT * FROM articles WHERE {$updatedQuery} ORDER BY created_at DESC", $params)->fetchAll();
+            $articles = $this->db->dbQuery("SELECT * FROM articles WHERE {$updatedQuery}", $params)->fetchAll();
 
             loadView('articles', [
                 'articles' => $articles,
@@ -57,11 +57,13 @@ class ArticlesController extends Database
         };
     }
 
+    // DISPLAY ALL ACTIVE ARTICLES PAGE
     public function displayArticlesPage(): void
     {
-        $this->fetchArticles("`status` = 'active'", 'All News');
+        $this->fetchArticles("`status` = 'active' ORDER BY created_at DESC LIMIT 1", 'All News');
     }
 
+    // SEARCH FEATURE FOR THE ALL ACTIVE ARTICLES PAGE
     public function searchArticle()
     {
         (string) $title = isset($_POST['article_title']) ? $_POST['article_title'] : '';
@@ -84,14 +86,14 @@ class ArticlesController extends Database
                 'title' => "%{$title}%",
             ];
 
-            $articles = $this->db->dbQuery($query, $params)->fetchAll();            
+            $articles = $this->db->dbQuery($query, $params)->fetchAll();
         } catch (Exception $e) {
             ErrorController::randomError('Error while retrieving articles');
             exit;
         }
 
         // load view
-        if(empty($articles)){
+        if (empty($articles)) {
             // store pop up msg in session
             Session::set('pop_up', [
                 'message' => 'There are articles based on search term'
@@ -99,7 +101,7 @@ class ArticlesController extends Database
 
             //redirect user 
             redirectUser("/articles");
-        }else{
+        } else {
             loadView('articles', [
                 'articles' => $articles,
                 'pageTitle' => 'All News',
@@ -108,6 +110,24 @@ class ArticlesController extends Database
         }
     }
 
+    // PAGINATION FEATURE FOR THE ALL ACTIVE ARTICLES PAGE
+    public function loadMoreArticles(): void
+    {
+        (int) $offset = isset($_POST['offset']) ? $_POST['offset'] : 0;
+
+        try {
+            $articles = $this->db->dbQuery("SELECT * FROM articles WHERE `status` = 'active' ORDER BY created_at DESC LIMIT 1 OFFSET {$offset}")->fetchAll();
+
+            foreach ($articles as $article) {
+                loadPartial('articleCard', ['article' => $article]);
+            }
+        } catch (Exception $e) {
+            ErrorController::randomError('Error while retrieving articles');
+            exit;
+        }
+    }
+
+    // DISPLAY SELECTED ARTICLE PAGE
     public function displaySelectedArticlePage(array $params): void
     {
         (array) $selectedArticle = $this->fetchSelectedArticle($params);
