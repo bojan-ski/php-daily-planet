@@ -5,6 +5,10 @@ declare(strict_types=1);
 // import autoload
 require __DIR__ . '/vendor/autoload.php';
 
+// import .env
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
 // import & insatiate session
 use Framework\Session;
 

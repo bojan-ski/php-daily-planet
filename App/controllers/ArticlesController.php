@@ -11,11 +11,14 @@ use Exception;
 class ArticlesController extends Database
 {
     protected Database $db;
+    private string $limit;
 
     public function __construct()
     {
         $config = require basePath('config/db.php');
         $this->db = new Database($config);
+
+        $this->limit = (string) $_ENV['LIMIT'];
     }
 
     // FETCH ARTICLES FROM DB - can be used in multiple class methods
@@ -59,14 +62,14 @@ class ArticlesController extends Database
 
     // DISPLAY ALL ACTIVE ARTICLES PAGE
     public function displayArticlesPage(): void
-    {
-        $this->fetchArticles("`status` = 'active' ORDER BY created_at DESC LIMIT 1", 'All News');
+    {       
+        $this->fetchArticles("`status` = 'active' ORDER BY created_at DESC LIMIT {$this->limit}", 'All News');
     }
 
     // SEARCH FEATURE FOR THE ALL ACTIVE ARTICLES PAGE
     public function searchArticle()
     {
-        (string) $title = isset($_POST['article_title']) ? $_POST['article_title'] : '';
+        $title = isset($_POST['article_title']) ? (string) $_POST['article_title'] : '';
 
         // check form data and display error
         if (!isString($title, 2, 40)) {
@@ -113,10 +116,10 @@ class ArticlesController extends Database
     // PAGINATION FEATURE FOR THE ALL ACTIVE ARTICLES PAGE
     public function loadMoreArticles(): void
     {
-        (int) $offset = isset($_POST['offset']) ? $_POST['offset'] : 0;
+        $offset = isset($_POST['offset']) ? (int) $_POST['offset'] : 0;
 
         try {
-            $articles = $this->db->dbQuery("SELECT * FROM articles WHERE `status` = 'active' ORDER BY created_at DESC LIMIT 1 OFFSET {$offset}")->fetchAll();
+            $articles = $this->db->dbQuery("SELECT * FROM articles WHERE `status` = 'active' ORDER BY created_at DESC LIMIT {$this->limit} OFFSET {$offset}")->fetchAll();
 
             foreach ($articles as $article) {
                 loadPartial('articleCard', ['article' => $article]);
@@ -130,15 +133,15 @@ class ArticlesController extends Database
     // DISPLAY SELECTED ARTICLE PAGE
     public function displaySelectedArticlePage(array $params): void
     {
-        (array) $selectedArticle = $this->fetchSelectedArticle($params);
+        $selectedArticle = $this->fetchSelectedArticle($params);
 
         /// get selected article - author
-        (array) $authorParams = [
+        $authorParams = [
             'user_id' => $selectedArticle['user_id']
         ];
 
         try {
-            (array) $selectedArticleAuthor = $this->db->dbQuery("SELECT DISTINCT `name` FROM users WHERE id = :user_id", $authorParams)->fetch();
+            $selectedArticleAuthor = $this->db->dbQuery("SELECT DISTINCT `name` FROM users WHERE id = :user_id", $authorParams)->fetch();
         } catch (Exception $e) {
             $selectedArticleAuthor = '';
         }
