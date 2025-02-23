@@ -1,31 +1,115 @@
--- create database --
-CREATE DATABASE IF NOT EXISTS daily_planet;
-USE workopia;
+-- CREATE DATABASE --
+CREATE DATABASE IF NOT EXISTS daily_planet_db;
 
--- create "users" table -- 
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-)
 
--- create "articles" table --
-CREATE TABLE `daily_planet`.`articles` (
+-- USE DATABASE --
+USE daily_planet_db;
+
+
+-- CREATE TABLE USERS -- 
+CREATE TABLE `daily_planet_db`.`users` (
   `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `role` VARCHAR(45) NOT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`));
+
+
+-- CREATE TABLE ARTICLES --
+CREATE TABLE `daily_planet_db`.`articles` (
+  `id` INT NOT NULL,
+  `user_id` INT NOT NULL,
   `title` VARCHAR(255) NOT NULL,
   `description` VARCHAR(255) NOT NULL,
-  `section_one` LONGTEXT NULL,
+  `section_one` LONGTEXT NOT NULL,
   `section_two` LONGTEXT NULL,
   `section_three` LONGTEXT NULL,
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` VARCHAR(45) NOT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`));
+
+
+-- UPDATE TABLES -> CONNECT --
+ALTER TABLE `daily_planet_db`.`articles` 
+ADD INDEX `fk_users_idx` (`user_id` ASC) VISIBLE;
+
+ALTER TABLE `daily_planet_db`.`articles` 
+ADD CONSTRAINT `fk_users`
+  FOREIGN KEY (`user_id`)
+  REFERENCES `daily_planet_db`.`users` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+
+
+-- CREATE TABLE BOOKMARKED -- 
+CREATE TABLE `daily_planet_db`.`bookmarked` (
+  `id` INT NOT NULL,
   `user_id` INT NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
-  CONSTRAINT `user_id`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `daily_planet`.`users` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+  `article_id` INT NOT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`));
+
+
+-- UPDATE TABLES -> CONNECT --
+ALTER TABLE `daily_planet_db`.`bookmarked` 
+ADD INDEX `fk_user_idx` (`user_id` ASC) VISIBLE;
+;
+ALTER TABLE `daily_planet_db`.`bookmarked` 
+ADD CONSTRAINT `fk_user`
+  FOREIGN KEY (`user_id`)
+  REFERENCES `daily_planet_db`.`users` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+
+
+ALTER TABLE `daily_planet_db`.`bookmarked` 
+ADD INDEX `fk_article_idx` (`article_id` ASC) VISIBLE;
+;
+ALTER TABLE `daily_planet_db`.`bookmarked` 
+ADD CONSTRAINT `fk_article`
+  FOREIGN KEY (`article_id`)
+  REFERENCES `daily_planet_db`.`articles` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+
+
+-- PITAJ --
+ALTER TABLE `daily_planet_db`.`bookmarked` 
+ADD INDEX `fk_users_idx` (`user_id` ASC) VISIBLE,
+ADD INDEX `fk_articles_idx` (`article_id` ASC) VISIBLE;
+;
+ALTER TABLE `daily_planet_db`.`bookmarked` 
+ADD CONSTRAINT `fk_users`
+  FOREIGN KEY (`user_id`)
+  REFERENCES `daily_planet_db`.`users` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE,
+ADD CONSTRAINT `fk_articles`
+  FOREIGN KEY (`article_id`)
+  REFERENCES `daily_planet_db`.`articles` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+
+
+-- INSERT DUMMY ARTICLES --
+INSERT INTO articles (title, description, section_one, section_two, section_three, created_at, user_id, status) VALUES
+('Article One', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean quis ullamcorper diam. Nullam diam mauris, tempor at finibus ut, placerat interdum dui. Vivamus vel porttitor dui. Integer convallis lorem dapibus tortor vulputate ultrices quis consectetur metus. Donec aliquam purus ultricies, viverra enim a, convallis erat. Donec fermentum arcu quis erat ultrices, sit amet efficitur enim euismod.', 'Donec fermentum arcu quis erat ultrices, sit amet efficitur enim euismod. Donec nec tempor risus, quis sodales leo. Nulla elementum congue eleifend. Suspendisse ultrices facilisis ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada.', 'Suspendisse ultrices facilisis ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada. Curabitur cursus, erat a pellentesque accumsan, nisi augue congue massa. Nam nec ligula id lorem iaculis tristique eget et ex.', '2025-02-12 03:25:10', 2, 'active'),
+('Article Two', 'A second article with more details.', 'Nunc consequat arcu vel ligula posuere, non ultricies mi consequat. Mauris euismod metus in libero tristique, eget posuere nisi pretium. Integer ornare tincidunt dui, vel scelerisque libero. Nulla vestibulum, sapien eget tincidunt feugiat.', 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aenean in arcu eget ligula placerat egestas. Fusce nec turpis vitae elit luctus tincidunt. Integer laoreet dolor nec felis dapibus, sit amet tempus quam faucibus.', 'Curabitur in libero a sapien accumsan scelerisque et et turpis. Phasellus bibendum justo ut sapien sagittis, nec convallis nunc cursus.', '2025-02-12 03:25:10', 11, 'pending'),
+('Article Three', 'Another example article.', 'Duis eget risus sit amet magna interdum hendrerit vel non felis. Ut ac lacus at nulla pellentesque tempus. Sed sollicitudin eros in magna luctus feugiat. Vestibulum porta lorem eget risus interdum, id dignissim quam dignissim.', 'Mauris faucibus orci nec felis auctor, ac efficitur nunc sollicitudin. Fusce fermentum urna in risus vehicula venenatis. Nulla aliquet elit ac magna lacinia.', 'Nam nec ligula id lorem iaculis tristique eget et ex. Ut hendrerit mauris nec purus tristique, a luctus turpis sollicitudin.', '2025-02-12 03:25:10', 18, 'active'),
+('Article Four', 'This is the fourth article.', 'Phasellus congue purus ac erat posuere, at facilisis est fermentum. Curabitur ut eros vel nisi pharetra tristique. Nulla nec magna eu odio facilisis ultricies in sit amet orci.', 'Donec et velit quis magna egestas tristique. Suspendisse potenti. Duis at augue eu ex scelerisque faucibus. Aenean vel elit id purus suscipit bibendum.', 'Vestibulum ac ipsum id felis varius consectetur in at metus. Nam ut risus at mauris dictum bibendum.', '2025-02-12 03:25:10', 21, 'active'),
+('Article Five', 'An informative article.', 'Suspendisse rutrum ligula in ligula varius, non efficitur magna sodales. Nulla vel libero id elit maximus porttitor eget sed odio. Proin et odio non enim eleifend ultricies.', 'Aliquam at mauris id leo bibendum sollicitudin. Integer euismod orci ut ex pretium, id vulputate turpis malesuada. Donec sodales convallis.', 'Donec feugiat ligula in nunc ultricies, non vulputate sapien venenatis. Etiam condimentum vel arcu eget sagittis.', '2025-02-12 03:25:10', 2, 'pending'),
+('Article Six', 'Description for article six.', 'Content for article six with 500-2000 characters in section one.', 'Content for article six with 500-2000 characters in section two.', 'Content for article six with 500-2000 characters in section three.', '2025-02-12 03:25:10', 11, 'active'),
+('Article Seven', 'Description for article seven.', 'Content for article seven with 500-2000 characters in section one.', 'Content for article seven with 500-2000 characters in section two.', 'Content for article seven with 500-2000 characters in section three.', '2025-02-12 03:25:10', 18, 'pending'),
+('Article Fifty', 'Final article description.', 'Final section one content with at least 500 characters, covering various aspects of the topic.', 'Final section two content with at least 500 characters, providing in-depth details.', 'Final section three content with at least 500 characters, concluding the discussion.', '2025-02-12 03:25:10', 21, 'pending');
+
+INSERT INTO articles (title, description, section_one, section_two, section_three, created_at, user_id, status) VALUES
+('Article Ten', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean quis ullamcorper diam. Nullam diam mauris, tempor at finibus ut, placerat interdum dui. Vivamus vel porttitor dui. Integer convallis lorem dapibus tortor vulputate ultrices quis consectetur metus. Donec aliquam purus ultricies, viverra enim a, convallis erat. Donec fermentum arcu quis erat ultrices, sit amet efficitur enim euismod.', 'Donec fermentum arcu quis erat ultrices, sit amet efficitur enim euismod. Donec nec tempor risus, quis sodales leo. Nulla elementum congue eleifend. Suspendisse ultrices facilisis ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada.', 'Suspendisse ultrices facilisis ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada. Curabitur cursus, erat a pellentesque accumsan, nisi augue congue massa. Nam nec ligula id lorem iaculis tristique eget et ex.', '2025-02-12 03:25:10', 2, 'active'),
+('Article Eleven', 'A second article with more details.', 'Nunc consequat arcu vel ligula posuere, non ultricies mi consequat. Mauris euismod metus in libero tristique, eget posuere nisi pretium. Integer ornare tincidunt dui, vel scelerisque libero. Nulla vestibulum, sapien eget tincidunt feugiat.', 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aenean in arcu eget ligula placerat egestas. Fusce nec turpis vitae elit luctus tincidunt. Integer laoreet dolor nec felis dapibus, sit amet tempus quam faucibus.', 'Curabitur in libero a sapien accumsan scelerisque et et turpis. Phasellus bibendum justo ut sapien sagittis, nec convallis nunc cursus.', '2025-02-12 03:25:10', 11, 'pending'),
+('Article Twelve', 'Another example article.', 'Duis eget risus sit amet magna interdum hendrerit vel non felis. Ut ac lacus at nulla pellentesque tempus. Sed sollicitudin eros in magna luctus feugiat. Vestibulum porta lorem eget risus interdum, id dignissim quam dignissim.', 'Mauris faucibus orci nec felis auctor, ac efficitur nunc sollicitudin. Fusce fermentum urna in risus vehicula venenatis. Nulla aliquet elit ac magna lacinia.', 'Nam nec ligula id lorem iaculis tristique eget et ex. Ut hendrerit mauris nec purus tristique, a luctus turpis sollicitudin.', '2025-02-12 03:25:10', 18, 'active'),
+('Article Thirteen', 'This is the fourth article.', 'Phasellus congue purus ac erat posuere, at facilisis est fermentum. Curabitur ut eros vel nisi pharetra tristique. Nulla nec magna eu odio facilisis ultricies in sit amet orci.', 'Donec et velit quis magna egestas tristique. Suspendisse potenti. Duis at augue eu ex scelerisque faucibus. Aenean vel elit id purus suscipit bibendum.', 'Vestibulum ac ipsum id felis varius consectetur in at metus. Nam ut risus at mauris dictum bibendum.', '2025-02-12 03:25:10', 21, 'active'),
+('Article Fourteen', 'An informative article.', 'Suspendisse rutrum ligula in ligula varius, non efficitur magna sodales. Nulla vel libero id elit maximus porttitor eget sed odio. Proin et odio non enim eleifend ultricies.', 'Aliquam at mauris id leo bibendum sollicitudin. Integer euismod orci ut ex pretium, id vulputate turpis malesuada. Donec sodales convallis.', 'Donec feugiat ligula in nunc ultricies, non vulputate sapien venenatis. Etiam condimentum vel arcu eget sagittis.', '2025-02-12 03:25:10', 2, 'pending'),
+('Article Fifteen', 'Description for article six.', 'Content for article six with 500-2000 characters in section one.', 'Content for article six with 500-2000 characters in section two.', 'Content for article six with 500-2000 characters in section three.', '2025-02-12 03:25:10', 11, 'active'),
+('Article Sixteen', 'Description for article seven.', 'Content for article seven with 500-2000 characters in section one.', 'Content for article seven with 500-2000 characters in section two.', 'Content for article seven with 500-2000 characters in section three.', '2025-02-12 03:25:10', 18, 'pending'),
+('Article Seventeen', 'Final article description.', 'Final section one content with at least 500 characters, covering various aspects of the topic.', 'Final section two content with at least 500 characters, providing in-depth details.', 'Final section three content with at least 500 characters, concluding the discussion.', '2025-02-12 03:25:10', 21, 'pending');
