@@ -1,6 +1,7 @@
 <?php loadPartial('head'); ?>
 <?php loadPartial('header'); ?>
 <?php loadPartial('navbar'); ?>
+<?php loadPartial('popUpMsg'); ?>
 
 <div class="profile-page container mx-auto">
     <section class="profile-data border-b pb-2 my-10 ">

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$pageUri = getPagePaths()[0];
+$pageUri = getPagePaths()[0] ?? '/';
 
 // ----- GENERAL - ALL USERS -----
 // article/articles

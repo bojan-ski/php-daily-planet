@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Framework\Middleware;
 
-use App\Controllers\ErrorController;
 use Framework\Session;
+use App\Controllers\ErrorController;
 
 class Authorization
 {

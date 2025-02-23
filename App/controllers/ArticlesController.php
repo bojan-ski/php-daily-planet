@@ -11,14 +11,14 @@ use Exception;
 class ArticlesController extends Database
 {
     protected Database $db;
-    private string $limit;
+    private int $limit;
 
     public function __construct()
     {
         $config = require basePath('config/db.php');
         $this->db = new Database($config);
 
-        $this->limit = (string) $_ENV['LIMIT'];
+        $this->limit = (int) $_ENV['LIMIT'];
     }
 
     // FETCH ARTICLES FROM DB - can be used in multiple class methods
@@ -40,29 +40,32 @@ class ArticlesController extends Database
     // FETCH SELECTED ARTICLE FROM DB - can be used in multiple class methods
     protected function fetchSelectedArticle(array $params): array
     {
-        // get selected article
+        // get selected article - params
         (string) $id = $params['id'] ?? '';
         (array) $articleId = [
             'id' => $id
         ];
 
         try {
-            return $this->db->dbQuery("SELECT * FROM articles WHERE id = :id", $articleId)->fetch();
+            $selectedArticle = $this->db->dbQuery("SELECT * FROM articles WHERE id = :id", $articleId)->fetch();
+
+            // display not found if selected article does not exist
+            if (!$selectedArticle) {
+                ErrorController::notFound();
+                exit;
+            };
+
+            // if exist - return selected article
+            return $selectedArticle;
         } catch (Exception $e) {
             ErrorController::randomError();
             exit;
         }
-
-        // display not found if selected article does not exist
-        if (!$selectedArticle) {
-            ErrorController::notFound();
-            exit;
-        };
     }
 
     // DISPLAY ALL ACTIVE ARTICLES PAGE
     public function displayArticlesPage(): void
-    {       
+    {
         $this->fetchArticles("`status` = 'active' ORDER BY created_at DESC LIMIT {$this->limit}", 'All News');
     }
 
@@ -99,7 +102,7 @@ class ArticlesController extends Database
         if (empty($articles)) {
             // store pop up msg in session
             Session::set('pop_up', [
-                'message' => 'There are articles based on search term'
+                'message' => 'No articles found for your search term'
             ]);
 
             //redirect user 
@@ -148,9 +151,9 @@ class ArticlesController extends Database
 
         if (Session::exist('user') && Session::get('user')['role'] == 'reader') {
             // check if article is bookmarked - READER USER ONLY
-            (bool) $articleBookmarked = false;
-            (string) $userId = Session::get('user')['id'] ?? '';
-            (string) $articleId = $params['id'] ?? '';
+            $articleBookmarked = false;
+            $userId = Session::get('user')['id'] ?? '';
+            $articleId = $params['id'] ?? '';
 
             (array) $bookmarkParams = [
                 'user_id' => $userId,
@@ -158,7 +161,7 @@ class ArticlesController extends Database
             ];
 
             try {
-                (array) $bookmarkedArticle = $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams)->fetch();
+                $bookmarkedArticle = $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams)->fetch();
             } catch (Exception $e) {
                 ErrorController::randomError();
                 exit;

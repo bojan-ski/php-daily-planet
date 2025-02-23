@@ -9,18 +9,18 @@ use Framework\Database;
 
 class HomeController extends Database
 {
-    protected Database $db;
+    private Database $db;
 
     public function __construct()
     {
-        (array) $config = require basePath('config/db.php');
+        $config = require basePath('config/db.php');
         $this->db = new Database($config);
     }
 
     public function latestArticles(): void
     {
         try {
-            (array) $articles = $this->db->dbQuery("SELECT * FROM articles WHERE `status` = 'active' ORDER BY created_at DESC LIMIT 3")->fetchAll();
+            $articles = $this->db->dbQuery("SELECT * FROM articles WHERE `status` = 'active' ORDER BY created_at DESC LIMIT 3")->fetchAll();
 
             loadView('home', [
                 'articles' => $articles

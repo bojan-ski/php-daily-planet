@@ -2,6 +2,9 @@
 
 use Framework\Session;
 
+$userLoggedIn = (bool) Session::exist('user');
+$userRole = Session::exist('user') ? (string) Session::get('user')['role'] : 'guest';
+
 ?>
 
 <nav class="bg-gray-100 text-center py-2">
@@ -24,17 +27,17 @@ use Framework\Session;
             <div
                 tabindex="0"
                 class="dropdown-content bg-base-100 rounded-box z-[10] w-72 p-2 shadow">
-                <a href="/" class="nav-link btn btn-ghost text-7xl mx-7">
+                <a href="/" class="nav-link btn btn-ghost text-xl mx-7">
                     Home
                 </a>
                 <a href="/articles" class="nav-link btn btn-ghost text-xl mx-7">
                     Articles
                 </a>
-                <?php if (Session::exist('user') && Session::get('user')['role'] == 'reader'): ?>
+                <?php if ($userLoggedIn && $userRole == 'reader'): ?>
                     <?php loadPartial('navbar/reader'); ?>
-                <?php elseif (Session::exist('user') && Session::get('user')['role'] == 'author'): ?>
+                <?php elseif ($userLoggedIn && $userRole == 'author'): ?>
                     <?php loadPartial('navbar/author'); ?>
-                <?php elseif (Session::exist('user') && Session::get('user')['role'] == 'admin'): ?>
+                <?php elseif ($userLoggedIn && $userRole == 'admin'): ?>
                     <?php loadPartial('navbar/admin'); ?>
                 <?php endif; ?>
             </div>
@@ -48,11 +51,11 @@ use Framework\Session;
         <a href="/articles" class="nav-link btn btn-ghost text-xl mx-7">
             Articles
         </a>
-        <?php if (Session::exist('user') && Session::get('user')['role'] == 'reader'): ?>
+        <?php if ($userLoggedIn && $userRole == 'reader'): ?>
             <?php loadPartial('navbar/reader'); ?>
-        <?php elseif (Session::exist('user') && Session::get('user')['role'] == 'author'): ?>
+        <?php elseif ($userLoggedIn && $userRole == 'author'): ?>
             <?php loadPartial('navbar/author'); ?>
-        <?php elseif (Session::exist('user') && Session::get('user')['role'] == 'admin'): ?>
+        <?php elseif ($userLoggedIn && $userRole == 'admin'): ?>
             <?php loadPartial('navbar/admin'); ?>
         <?php endif; ?>
     </div>

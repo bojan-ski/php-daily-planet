@@ -9,12 +9,12 @@ require __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-// import & insatiate session
+// import & instantiate session
 use Framework\Session;
 
 Session::start();
 
-// import & insatiate router
+// import & instantiate router
 use Framework\Router;
 
 $router = new Router();
@@ -26,7 +26,7 @@ require './utils/helpers.php';
 $routes = require basePath('App/routes.php');
 
 // app - user routes
-$uri = $_SERVER['REQUEST_URI'];
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
 $router->route($uri, $method);

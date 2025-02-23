@@ -10,7 +10,7 @@ use Exception;
 
 class AuthController extends Database
 {
-    protected Database $db;
+    private Database $db;
 
     public function __construct()
     {
@@ -30,10 +30,10 @@ class AuthController extends Database
 
     public function register(): void
     {
-        (string) $name = isset($_POST['name']) ? $_POST['name'] : '';
-        (string) $email = isset($_POST['email']) ? $_POST['email'] : '';
-        (string) $password = isset($_POST['password']) ? $_POST['password'] : '';
-        (string) $passwordConfirmation = isset($_POST['password_confirmation']) ? $_POST['password_confirmation'] : '';
+        $name = isset($_POST['name']) ? (string) $_POST['name'] : '';
+        $email = isset($_POST['email']) ? (string) $_POST['email'] : '';
+        $password = isset($_POST['password']) ? (string) $_POST['password'] : '';
+        $passwordConfirmation = isset($_POST['password_confirmation']) ? (string) $_POST['password_confirmation'] : '';
 
         // check user form data & display error if exist
         $errors = [];
@@ -73,7 +73,7 @@ class AuthController extends Database
         ];
 
         try {
-            (array) $emailTaken = $this->db->dbQuery("SELECT DISTINCT `email` FROM users WHERE email = :email", $emailParams)->fetch();
+            $emailTaken = $this->db->dbQuery("SELECT DISTINCT `email` FROM users WHERE email = :email", $emailParams)->fetch();
         } catch (Exception $e) {
             ErrorController::randomError('Error while creating account');
             exit;
@@ -130,8 +130,8 @@ class AuthController extends Database
 
     public function login(): void
     {
-        (string) $email = isset($_POST['email']) ? $_POST['email'] : '';
-        (string) $password = isset($_POST['password']) ? $_POST['password'] : '';
+        $email = isset($_POST['email']) ? (string) $_POST['email'] : '';
+        $password = isset($_POST['password']) ? (string) $_POST['password'] : '';
 
         // check user form data & display error if exist
         $errors = [];
@@ -159,7 +159,7 @@ class AuthController extends Database
         ];
 
         try {
-            (array) $user = $this->db->dbQuery("SELECT * FROM users WHERE email = :email", $emailParams)->fetch();
+            $user = $this->db->dbQuery("SELECT * FROM users WHERE email = :email", $emailParams)->fetch();
         } catch (Exception $e) {
             ErrorController::randomError('Error while login');
             exit;

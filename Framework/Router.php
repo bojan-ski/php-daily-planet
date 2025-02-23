@@ -9,7 +9,7 @@ use Framework\Middleware\Authorization;
 
 class Router extends Authorization
 {
-    private $routes = [];
+    private array $routes = [];
 
     private function createRoute(string $method, string $uri, string $controller, string $controllerMethod, array $roles = []): void
     {
@@ -44,21 +44,17 @@ class Router extends Authorization
 
     public function route(string $uri, string $method): void
     {
-        if($method == "POST" && isset($_POST['_method'])){
+        // convert POST method to PUT or DELETE (if required)
+        if ($method == "POST" && isset($_POST['_method'])) {
             $method = strtoupper($_POST['_method']);
         }
 
         foreach ($this->routes as $route) {
-            // inspect($route);
+            // get param (id) from {id}
+            $match = true;
 
-            (bool) $match = true;
-
-            (array) $uriSegments = explode('/', trim($uri, '/'));
-            // inspect($uriSegments);
-            // inspectAndDie($uriSegments);
-
-            (array) $routeSegments = explode('/', trim($route['uri'], '/'));
-            // inspect($routeSegments);
+            $uriSegments = explode('/', trim($uri, '/'));
+            $routeSegments = explode('/', trim($route['uri'], '/'));
 
             if (count($uriSegments) == count($routeSegments) && strtoupper($route['method']) == $method) {
                 (array) $params = [];
@@ -72,14 +68,15 @@ class Router extends Authorization
                     }
 
                     if (preg_match('/\{(.+?)\}/', $routeSegments[$i], $matches)) {
-                        $params[$matches[1]] = $uriSegments[$i];
+                        (array) $params[$matches[1]] = $uriSegments[$i];
                     }
                 }
 
                 if ($match) {
-                    // check user if user is logged in and check user role (check if user has authorization)
+                    // check user if user is logged in && check user role (check if user has authorization)
                     $this->isAuthorized($route['roles']);
 
+                    // call required controller & method
                     (string) $requestedController = 'App\\controllers\\' . $route['controller'];
                     (string) $requestedControllerMethod = $route['controllerMethod'];
 

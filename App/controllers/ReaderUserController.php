@@ -10,38 +10,44 @@ use Framework\Session;
 
 class ReaderUserController extends Database
 {
-    protected Database $db;
+    private Database $db;
+    private array $user;
     public string $backPath;
 
     public function __construct()
     {
         $config = require basePath('config/db.php');
         $this->db = new Database($config);
+
+        $this->user = (Session::exist('user') && Session::get('user')['role'] == 'reader') ? Session::get('user') : null;
+
         $this->backPath = getPagePaths()[0];
+    }
+
+    private function bookmarkedArticles(): array | null
+    {
+        (array) $userId = [
+            'id' => $this->user['id'] ?? null
+        ];
+
+        try {
+            return $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :id", $userId)->fetchAll();
+        } catch (Exception $e) {
+            ErrorController::randomError('There was an error while displaying user bookmarked articles');
+            exit;
+        }
     }
 
     public function displayReaderProfilePage(): void
     {
-        // get user from session
-        (array) $user = Session::get('user');
-
-        if (isset($user)) {
+        if (isset($this->user)) {
             // get all bookmarked articles (ids) from bookmarked table 
-            (array) $userId = [
-                'id' => Session::get('user')['id']
-            ];
-
-            try {
-                (array) $bookmarkedArticlesIds = $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :id", $userId)->fetchAll();
-            } catch (Exception $e) {
-                ErrorController::randomError('There was an error while displaying user bookmarked articles');
-                exit;
-            }
+            $bookmarkedArticlesIds = $this->bookmarkedArticles();
 
             // if reader user has bookmarked articles
             if ($bookmarkedArticlesIds) {
                 // Extract all article_id
-                (array) $articleIds = array_column($bookmarkedArticlesIds, "article_id");
+                $articleIds = array_column($bookmarkedArticlesIds, "article_id");
 
                 // get all bookmarked articles from articles table
                 $placeholders = [];
@@ -64,7 +70,7 @@ class ReaderUserController extends Database
 
             // load view
             loadView('readerUser/profile', [
-                'user' => $user,
+                'user' => $this->user,
                 'bookmarkedArticles' => $bookmarkedArticles ?? ''
             ]);
         } else {
@@ -75,9 +81,9 @@ class ReaderUserController extends Database
 
     public function bookmarkFeature(array $params): void
     {
-        if (Session::exist('user') && Session::get('user')['role'] == 'reader') {
-            (string) $userId = Session::get('user')['id'] ?? '';
-            (string) $articleId = $params['id'] ?? '';
+        if (isset($this->user)) {
+            $userId = (string) Session::get('user')['id'] ?? '';
+            $articleId = (string) $params['id'] ?? '';
 
             // check if article is bookmarked
             (array) $bookmarkParams = [
@@ -86,7 +92,7 @@ class ReaderUserController extends Database
             ];
 
             try {
-                (array) $isBookmarked = $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams)->fetch();
+                $isBookmarked = $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams)->fetch();
             } catch (Exception $e) {
                 ErrorController::randomError();
                 exit;
@@ -132,31 +138,44 @@ class ReaderUserController extends Database
                 }
             }
         } else {
-            ErrorController::randomError();
+            ErrorController::randomError('You not able to perform the following action!');
             exit;
         }
     }
 
     public function deleteAccount(): void
     {
-        // get reader user id
-        (array) $userId = [
-            'id' => Session::get('user')['id']
-        ];
+        if (isset($this->user)) {
+            // get all bookmarked articles (ids) from bookmarked table 
+            $bookmarkedArticlesIds = $this->bookmarkedArticles();
 
-        if (isset($userId['id'])) {
-            try {
-                // delete account from db
-                $this->db->dbQuery("DELETE FROM users WHERE id = :id", $userId);
+            if (empty($bookmarkedArticlesIds)) {
+                // get reader user id
+                (array) $userId = [
+                    'id' => $this->user['id'] ?? null
+                ];
 
-                // delete user data from session
-                Session::clearAll();
+                try {
+                    // delete account from db
+                    $this->db->dbQuery("DELETE FROM users WHERE id = :id", $userId);
+
+                    // delete user data from session
+                    Session::clearAll();
+
+                    //redirect user 
+                    redirectUser("/");
+                } catch (Exception $e) {
+                    ErrorController::randomError('User does not exist');
+                    exit;
+                }
+            } else {
+                // store pop up msg in session
+                Session::set('pop_up', [
+                    'message' => 'Please remove all bookmarked articles'
+                ]);
 
                 //redirect user 
-                redirectUser("/");
-            } catch (Exception $e) {
-                ErrorController::randomError('User does not exist');
-                exit;
+                redirectUser("/profile");
             }
         } else {
             ErrorController::randomError('You not able to perform the following action!');

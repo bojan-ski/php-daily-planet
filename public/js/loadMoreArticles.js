@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!articlesContainer || !loadMoreBtn) return;
 
-    let offset = 1;
+    let offset = 12;
 
     loadMoreBtn.addEventListener('click', async function () {        
         try {
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let data = await response.text();          
 
             articlesContainer.insertAdjacentHTML('beforeend', data);
-            offset += 1;
+            offset += 12;
         } catch (error) {
             console.error('Error loading more articles:', error);
         }

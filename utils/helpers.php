@@ -11,7 +11,7 @@ function basePath(string $path = ''): string
 // LOAD VIEW
 function loadView(string $name, $data = []): void
 {
-    (string) $viewPath = basePath("App/views/{$name}.view.php");
+    $viewPath = basePath("App/views/{$name}.view.php");
 
     if (file_exists($viewPath)) {
         extract($data);
@@ -24,7 +24,7 @@ function loadView(string $name, $data = []): void
 // LOAD PARTIAL
 function loadPartial(string $name, $data = []): void
 {
-    (string) $partialPath = basePath("App/views/partials/{$name}.php");
+    $partialPath = basePath("App/views/partials/{$name}.php");
 
     if (file_exists($partialPath)) {
         extract($data);
@@ -81,7 +81,7 @@ function doesMatch(string $formDataOne, string $formDataTwo): bool
 };
 
 // FORMAT DATE
-function formateDate(string $date): string{
+function formatDate(string $date): string{
     return date("d.m.Y", strtotime($date));
 }
 

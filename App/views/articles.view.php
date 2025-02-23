@@ -40,7 +40,7 @@
             </div>
         </section>
 
-        <?php if (getPagePaths()[0] == 'articles'): ?>
+        <?php if (getPagePaths()[0] == 'articles' && !isset($search)): ?>
             <?php loadPartial('articles/loadMoreBtn'); ?>
         <?php endif; ?>
 

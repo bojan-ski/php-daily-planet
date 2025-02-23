@@ -20,6 +20,7 @@ class ManageArticlesController extends ArticlesController
         $this->userId = [
             'id' => Session::get('user')['id']
         ];
+        
         $this->backPath = getPagePaths()[0];
     }
 
@@ -51,11 +52,11 @@ class ManageArticlesController extends ArticlesController
     public function submitArticle(): void
     {
         if (Session::exist('user') && Session::get('user')['role'] == 'author') {
-            (string) $title = isset($_POST['title']) ? $_POST['title'] : '';
-            (string) $description = isset($_POST['description']) ? $_POST['description'] : '';
-            (string) $section_one = isset($_POST['section_one']) ? $_POST['section_one'] : '';
-            $section_two = isset($_POST['section_two']) ? $_POST['section_two'] : null;
-            $section_three = isset($_POST['section_three']) ? $_POST['section_three'] : null;
+            $title = isset($_POST['title']) ? (string) $_POST['title'] : '';
+            $description = isset($_POST['description']) ? (string) $_POST['description'] : '';
+            $section_one = isset($_POST['section_one']) ? (string) $_POST['section_one'] : '';
+            $section_two = isset($_POST['section_two']) ? (string) $_POST['section_two'] : null;
+            $section_three = isset($_POST['section_three']) ? (string) $_POST['section_three'] : null;
 
             // check form data & display error if exist
             $errors = [];
@@ -103,8 +104,10 @@ class ManageArticlesController extends ArticlesController
             ];
 
             try {
-                $this->db->dbQuery("INSERT INTO articles (`title`, `description`, `section_one`, `section_two`,
-            `section_three`, `created_at`, `user_id`, `status`) VALUES (:title, :description, :section_one, :section_two, :section_three, :created_at, :user_id, :status )", $newArticle);
+                $query = "INSERT INTO articles (`title`, `description`, `section_one`, `section_two`,
+                `section_three`, `created_at`, `user_id`, `status`) VALUES (:title, :description, :section_one, :section_two, :section_three, :created_at, :user_id, :status )";
+
+                $this->db->dbQuery($query, $newArticle);
             } catch (Exception $e) {
                 ErrorController::randomError('Error while submitting article');
                 exit;
@@ -153,7 +156,7 @@ class ManageArticlesController extends ArticlesController
     public function displayEditSelectedArticlePage(array $params): void
     {
         // get selected article - data
-        (array) $selectedArticle = $this->fetchSelectedArticle($params);
+        $selectedArticle = $this->fetchSelectedArticle($params);
 
         // display page - view
         loadView('authorAndAdminUser/editSelectedArticle', [
@@ -165,7 +168,7 @@ class ManageArticlesController extends ArticlesController
     public function editSelectedArticle(array $params): void
     {
         // get selected article - data
-        (array) $selectedArticle = $this->fetchSelectedArticle($params);
+        $selectedArticle = $this->fetchSelectedArticle($params);
 
         // check if user has permission to edit
         if (!HasPermission::editOption($selectedArticle['status'], $selectedArticle['user_id'])) {
@@ -254,7 +257,7 @@ class ManageArticlesController extends ArticlesController
     public function deleteSelectedArticle(array $params): void
     {
         // get selected article - data
-        (array) $selectedArticle = $this->fetchSelectedArticle($params);
+        $selectedArticle = $this->fetchSelectedArticle($params);
 
         if (HasPermission::isAllowed($selectedArticle['user_id'])) {
             try {

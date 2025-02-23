@@ -52,7 +52,7 @@ use Framework\Session;
         </p>
         <p>
             <span class="font-semibold">Published:</span>
-            <?= isset($selectedArticle['created_at']) ? formateDate(checkContent($selectedArticle['created_at'])) : '' ?>
+            <?= isset($selectedArticle['created_at']) ? formatDate(checkContent($selectedArticle['created_at'])) : '' ?>
         </p>
     </div>
 </div>

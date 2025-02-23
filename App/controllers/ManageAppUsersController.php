@@ -11,11 +11,14 @@ use Exception;
 class ManageAppUsersController extends Database
 {
     private Database $db;
+    private bool $adminUser;
 
     public function __construct()
     {
         $config = require basePath('config/db.php');
         $this->db = new Database($config);
+
+        $this->adminUser = (Session::exist('user') && Session::get('user')['role'] == 'admin') ? true : false;
     }
 
     // FETCH USERS FROM DB - can be used in multiple class methods 
@@ -32,7 +35,7 @@ class ManageAppUsersController extends Database
     public function displayAuthorsPage(): void
     {
         // get all author users
-        (array) $authorUsers = $this->fetchUsers('author', 'Error while retrieving all author users');
+        $authorUsers = $this->fetchUsers('author', 'Error while retrieving all author users');
 
         // load view
         loadView('/adminUser/authors', [
@@ -42,7 +45,7 @@ class ManageAppUsersController extends Database
 
     public function removeAuthor(): void
     {
-        if (Session::exist('user') && Session::get('user')['role'] == 'admin') {
+        if ($this->adminUser) {
             // get author user id
             (array) $authorId = [
                 'id' => $_POST['author_id'] ?? null
@@ -82,10 +85,10 @@ class ManageAppUsersController extends Database
 
     public function addAuthor(): void
     {
-        if (Session::exist('user') && Session::get('user')['role'] == 'admin') {
-            (string) $name = isset($_POST['name']) ? $_POST['name'] : '';
-            (string) $email = isset($_POST['email']) ? $_POST['email'] : '';
-            (string) $password = isset($_POST['password']) ? $_POST['password'] : '';
+        if ($this->adminUser) {
+            $name = isset($_POST['name']) ? (string) $_POST['name'] : '';
+            $email = isset($_POST['email']) ? (string) $_POST['email'] : '';
+            $password = isset($_POST['password']) ? (string) $_POST['password'] : '';
 
             // check form data & display error if exist
             $errors = [];
@@ -117,7 +120,7 @@ class ManageAppUsersController extends Database
             ];
 
             try {
-                (array) $emailTaken = $this->db->dbQuery("SELECT DISTINCT `email` FROM users WHERE email = :email", $emailParams)->fetch();
+                $emailTaken = $this->db->dbQuery("SELECT DISTINCT `email` FROM users WHERE email = :email", $emailParams)->fetch();
             } catch (Exception $e) {
                 ErrorController::randomError('Error while creating account');
                 exit;
@@ -168,7 +171,7 @@ class ManageAppUsersController extends Database
     public function displayReadersPage(): void
     {
         // get all reader users
-        (array) $readerUsers = $this->fetchUsers('reader', 'Error while retrieving all reader users');
+        $readerUsers = $this->fetchUsers('reader', 'Error while retrieving all reader users');
 
         // load view
         loadView('/adminUser/readers', [
