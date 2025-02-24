@@ -23,7 +23,7 @@
                 <form method="POST" action="/profile/deleteAccount">
                     <input type="hidden" name="_method" value="DELETE">
                     <button type="submit" class="rounded-md block px-4 py-2 bg-red-500 hover:bg-red-600 text-white">
-                        Delete account
+                    <i class="fa-solid fa-user-slash"></i>
                     </button>
                 </form>
             </div>
