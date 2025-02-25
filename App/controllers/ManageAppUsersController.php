@@ -4,40 +4,25 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use Framework\Database;
+use App\Models\UsersModels;
 use Framework\Session;
-use Exception;
 
-class ManageAppUsersController extends Database
+class ManageAppUsersController extends UsersModels
 {
-    private Database $db;
     private bool $adminUser;
 
     public function __construct()
     {
-        $config = require basePath('config/db.php');
-        $this->db = new Database($config);
+        parent::__construct();
 
         $this->adminUser = (Session::exist('user') && Session::get('user')['role'] == 'admin') ? true : false;
     }
 
-    // FETCH USERS FROM DB - can be used in multiple class methods 
-    private function fetchUsers(string $role, string $errorMessage): array | null
-    {
-        try {
-            return $this->db->dbQuery("SELECT id, name, email, created_at FROM users WHERE `role` = '{$role}' ORDER BY created_at DESC")->fetchAll();
-        } catch (Exception $e) {
-            ErrorController::randomError($errorMessage);
-            exit;
-        }
-    }
 
     public function displayAuthorsPage(): void
     {
-        // get all author users
         $authorUsers = $this->fetchUsers('author', 'Error while retrieving all author users');
 
-        // load view
         loadView('/adminUser/authors', [
             'authorUsers' => $authorUsers
         ]);
@@ -46,31 +31,11 @@ class ManageAppUsersController extends Database
     public function removeAuthor(): void
     {
         if ($this->adminUser) {
-            // get author user id
             (array) $authorId = [
                 'id' => $_POST['author_id'] ?? null
             ];
 
-            if (isset($authorId['id'])) {
-                try {
-                    // delete author user from db
-                    $this->db->dbQuery("DELETE FROM users WHERE id = :id", $authorId);
-
-                    // store pop up msg in session
-                    Session::set('pop_up', [
-                        'message' => 'Author removed'
-                    ]);
-
-                    //redirect user 
-                    redirectUser("/authors");
-                } catch (Exception $e) {
-                    ErrorController::randomError('Author does not exist');
-                    exit;
-                }
-            } else {
-                ErrorController::randomError();
-                exit;
-            }
+            $this->deleteAuthorFromDB($authorId);
         } else {
             ErrorController::accessDenied();
             exit;
@@ -79,7 +44,6 @@ class ManageAppUsersController extends Database
 
     public function displayAddAuthorPage(): void
     {
-        // load view
         loadView('/adminUser/addAuthor');
     }
 
@@ -119,12 +83,7 @@ class ManageAppUsersController extends Database
                 'email' => $email
             ];
 
-            try {
-                $emailTaken = $this->db->dbQuery("SELECT DISTINCT `email` FROM users WHERE email = :email", $emailParams)->fetch();
-            } catch (Exception $e) {
-                ErrorController::randomError('Error while creating account');
-                exit;
-            }
+            $emailTaken = $this->isEmailTaken($emailParams);
 
             if (isset($emailTaken) && !empty($emailTaken['email'])) {
                 $errors['email'] = 'Email your provided is in use.';
@@ -148,12 +107,7 @@ class ManageAppUsersController extends Database
                 'role' => 'author'
             ];
 
-            try {
-                $this->db->dbQuery("INSERT INTO users (`name`, `email`, `password`, `created_at`, `role`) VALUES (:name, :email, :password, :created_at, :role)", $newAuthorUser);
-            } catch (Exception $e) {
-                ErrorController::randomError('Error while creating account');
-                exit;
-            }
+            $this->createUser($newAuthorUser);
 
             // store pop up msg in session
             Session::set('pop_up', [
@@ -170,10 +124,8 @@ class ManageAppUsersController extends Database
 
     public function displayReadersPage(): void
     {
-        // get all reader users
         $readerUsers = $this->fetchUsers('reader', 'Error while retrieving all reader users');
 
-        // load view
         loadView('/adminUser/readers', [
             'readerUsers' => $readerUsers
         ]);

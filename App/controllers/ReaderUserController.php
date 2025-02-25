@@ -4,45 +4,30 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Models\ArticlesModels;
 use Exception;
 use Framework\Database;
 use Framework\Session;
 
-class ReaderUserController extends Database
+class ReaderUserController extends ArticlesModels
 {
-    private Database $db;
     private array $user;
     public string $backPath;
 
     public function __construct()
     {
-        $config = require basePath('config/db.php');
-        $this->db = new Database($config);
+        parent::__construct();
 
         $this->user = (Session::exist('user') && Session::get('user')['role'] == 'reader') ? Session::get('user') : null;
 
         $this->backPath = getPagePaths()[0];
     }
 
-    private function bookmarkedArticles(): array | null
-    {
-        (array) $userId = [
-            'id' => $this->user['id'] ?? null
-        ];
-
-        try {
-            return $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :id", $userId)->fetchAll();
-        } catch (Exception $e) {
-            ErrorController::randomError('There was an error while displaying user bookmarked articles');
-            exit;
-        }
-    }
-
     public function displayReaderProfilePage(): void
     {
         if (isset($this->user)) {
             // get all bookmarked articles (ids) from bookmarked table 
-            $bookmarkedArticlesIds = $this->bookmarkedArticles();
+            $bookmarkedArticlesIds = $this->fetchBookmarkedArticles($this->user);
 
             // if reader user has bookmarked articles
             if ($bookmarkedArticlesIds) {
@@ -60,12 +45,7 @@ class ReaderUserController extends Database
 
                 $query = "SELECT * FROM articles WHERE id IN (" . implode(', ', $placeholders) . ")";
 
-                try {
-                    (array) $bookmarkedArticles = $this->db->dbQuery($query, $params)->fetchAll();
-                } catch (Exception $e) {
-                    ErrorController::randomError('There was an error while displaying user bookmarked articles');
-                    exit;
-                }
+                // $bookmarkedArticles = $this->fetchArticles($query, $params);
             }
 
             // load view
@@ -91,29 +71,11 @@ class ReaderUserController extends Database
                 'article_id' => $articleId
             ];
 
-            try {
-                $isBookmarked = $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams)->fetch();
-            } catch (Exception $e) {
-                ErrorController::randomError();
-                exit;
-            }
+                $isBookmarked = $this->isBookmarkedArticles($bookmarkParams);
 
             // if bookmarked
             if ($isBookmarked) {
-                try {
-                    $this->db->dbQuery("DELETE FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams);
-
-                    // store pop up msg in session
-                    Session::set('pop_up', [
-                        'message' => 'Bookmark removed'
-                    ]);
-
-                    //redirect user 
-                    redirectUser("/$this->backPath/" . $params['id']);
-                } catch (Exception $e) {
-                    ErrorController::randomError('There was an error while removing the bookmark');
-                    exit;
-                }
+                $this->addBookmark($bookmarkParams, $this->backPath, $params['id']);
             } else {
                 // if not bookmarked
                 (array) $newBookmark = [
@@ -122,20 +84,7 @@ class ReaderUserController extends Database
                     'created_at' => date("Y-m-d h:i:s")
                 ];
 
-                try {
-                    $this->db->dbQuery("INSERT INTO bookmarked (`user_id`, `article_id`, `created_at`) VALUES (:user_id, :article_id, :created_at)", $newBookmark);
-
-                    // store pop up msg in session
-                    Session::set('pop_up', [
-                        'message' => 'Article bookmarked'
-                    ]);
-
-                    //redirect user 
-                    redirectUser("/$this->backPath/" . $params['id']);
-                } catch (Exception $e) {
-                    ErrorController::randomError('There was an error while bookmarking the article');
-                    exit;
-                }
+                $this->removeBookmark($newBookmark, $this->backPath, $params['id'] );
             }
         } else {
             ErrorController::randomError('You not able to perform the following action!');
@@ -147,7 +96,7 @@ class ReaderUserController extends Database
     {
         if (isset($this->user)) {
             // get all bookmarked articles (ids) from bookmarked table 
-            $bookmarkedArticlesIds = $this->bookmarkedArticles();
+            $bookmarkedArticlesIds = $this->fetchBookmarkedArticles($this->user);
 
             if (empty($bookmarkedArticlesIds)) {
                 // get reader user id

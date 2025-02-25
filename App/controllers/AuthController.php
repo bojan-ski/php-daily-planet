@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Models\UsersModels;
 use Framework\Database;
 use Framework\Session;
 use Exception;
 
-class AuthController extends Database
+class AuthController extends UsersModels
 {
-    private Database $db;
-
     public function __construct()
     {
-        $config = require basePath('config/db.php');
-        $this->db = new Database($config);
+        parent::__construct();
     }
 
     public function displaySignUpPage(): void
@@ -72,12 +70,7 @@ class AuthController extends Database
             'email' => $email
         ];
 
-        try {
-            $emailTaken = $this->db->dbQuery("SELECT DISTINCT `email` FROM users WHERE email = :email", $emailParams)->fetch();
-        } catch (Exception $e) {
-            ErrorController::randomError('Error while creating account');
-            exit;
-        }
+        $emailTaken = $this->isEmailTaken($emailParams);
 
         if (isset($emailTaken) && !empty($emailTaken['email'])) {
             $errors['email'] = 'Email your provided is in use.';
@@ -101,15 +94,10 @@ class AuthController extends Database
             'role' => 'reader'
         ];
 
-        try {
-            $this->db->dbQuery("INSERT INTO users (`name`, `email`, `password`, `created_at`, `role`) VALUES (:name, :email, :password, :created_at, :role)", $newUser);
-        } catch (Exception $e) {
-            ErrorController::randomError('Error while creating account');
-            exit;
-        }
+        $this->createUser($newUser);
 
         // get id of new user
-        $newUserId = $this->db->conn->lastInsertId();
+        $newUserId = $this->newUserID();
 
         // store new user in session
         Session::set('user', [
@@ -158,12 +146,7 @@ class AuthController extends Database
             'email' => $email
         ];
 
-        try {
-            $user = $this->db->dbQuery("SELECT * FROM users WHERE email = :email", $emailParams)->fetch();
-        } catch (Exception $e) {
-            ErrorController::randomError('Error while login');
-            exit;
-        }
+        $user = $this->userExists($emailParams);
 
         if (!isset($user) || empty($user['email'])) {
             $errors['bad_credentials'] = 'Incorrect Credentials';

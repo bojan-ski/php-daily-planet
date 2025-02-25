@@ -112,7 +112,7 @@ class ArticlesController extends ArticlesModels
                 'article_id' => $articleId
             ];
 
-            $bookmarkedArticle = $this->fetchBookmarkedArticles($bookmarkParams);
+            $bookmarkedArticle = $this->isBookmarkedArticles($bookmarkParams);
 
             // if bookmarked
             if ($bookmarkedArticle) {

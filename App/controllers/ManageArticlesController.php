@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use Exception;
 use Framework\HasPermission;
 use Framework\Session;
 
@@ -27,19 +26,40 @@ class ManageArticlesController extends ArticlesController
     // DISPLAY ALL AUTHOR ACTIVE ARTICLES PAGE - author user
     public function displayAuthorActiveArticlesPage(): void
     {
-        $this->fetchArticles("`status` = 'active' AND `user_id` = :id ORDER BY created_at DESC", 'My active articles', $this->userId);
+        $updatedQuery = "`status` = 'active' AND `user_id` = :id ORDER BY created_at DESC";
+
+        $this->fetchArticles($updatedQuery, $this->userId);
+
+        loadView('articles', [
+            'pageTitle' => 'My active articles',
+            'articles' => $articles ?? ''
+        ]);
     }
 
     // DISPLAY ALL AUTHOR PENDING ARTICLES PAGE - author user
     public function displayAuthorPendingArticlesPage(): void
     {
-        $this->fetchArticles("`status` = 'pending' AND `user_id` = :id ORDER BY created_at DESC", 'My pending articles', $this->userId);
+        $updatedQuery = "`status` = 'pending' AND `user_id` = :id ORDER BY created_at DESC";
+
+        $this->fetchArticles($updatedQuery, $this->userId);
+
+        loadView('articles', [
+            'pageTitle' => 'My pending articles',
+            'articles' => $articles ?? ''
+        ]);
     }
 
     // DISPLAY ALL PENDING ARTICLES PAGE - admin user
     public function displayAllPendingArticlesPage(): void
     {
-        $this->fetchArticles("`status` = 'pending' ORDER BY created_at DESC", 'All pending articles');
+        $updatedQuery = "`status` = 'pending' ORDER BY created_at DESC";
+
+        $this->fetchArticles($updatedQuery);
+
+        loadView('articles', [
+            'pageTitle' => 'All pending articles',
+            'articles' => $articles ?? ''
+        ]);
     }
 
     // DISPLAY SUBMIT NEW ARTICLE PAGE - author user
@@ -103,15 +123,7 @@ class ManageArticlesController extends ArticlesController
                 'status' => 'pending'
             ];
 
-            try {
-                $query = "INSERT INTO articles (`title`, `description`, `section_one`, `section_two`,
-                `section_three`, `created_at`, `user_id`, `status`) VALUES (:title, :description, :section_one, :section_two, :section_three, :created_at, :user_id, :status )";
-
-                $this->db->dbQuery($query, $newArticle);
-            } catch (Exception $e) {
-                ErrorController::randomError('Error while submitting article');
-                exit;
-            }
+            $this->createArticle($newArticle);
 
             // store pop up msg in session
             Session::set('pop_up', [
@@ -132,20 +144,7 @@ class ManageArticlesController extends ArticlesController
         (array) $selectedArticle = $this->fetchSelectedArticle($params);
 
         if (HasPermission::approveOption($selectedArticle['status'])) {
-            try {
-                $this->db->dbQuery("UPDATE articles SET `status` = 'active' WHERE id = :id", $params);
-
-                // store pop up msg in session
-                Session::set('pop_up', [
-                    'message' => 'Article approved'
-                ]);
-
-                //redirect user 
-                redirectUser('/pending_articles');
-            } catch (Exception $e) {
-                ErrorController::randomError();
-                exit;
-            }
+            $this->approveArticle($params);
         } else {
             ErrorController::accessDenied();
             exit;
@@ -155,10 +154,8 @@ class ManageArticlesController extends ArticlesController
     // DISPLAY EDIT ARTICLE PAGE - author & admin user
     public function displayEditSelectedArticlePage(array $params): void
     {
-        // get selected article - data
         $selectedArticle = $this->fetchSelectedArticle($params);
 
-        // display page - view
         loadView('authorAndAdminUser/editSelectedArticle', [
             'selectedArticle' => $selectedArticle
         ]);
@@ -237,12 +234,7 @@ class ManageArticlesController extends ArticlesController
                 created_at = :created_at
             WHERE id = :id";
 
-        try {
-            $this->db->dbQuery($updateArticleQuery, $updatedSelectedArticle);
-        } catch (Exception $e) {
-            ErrorController::randomError('Error while editing article');
-            exit;
-        }
+        $this->editArticle($updateArticleQuery, $updatedSelectedArticle);
 
         // store pop up msg in session
         Session::set('pop_up', [
@@ -260,20 +252,7 @@ class ManageArticlesController extends ArticlesController
         $selectedArticle = $this->fetchSelectedArticle($params);
 
         if (HasPermission::isAllowed($selectedArticle['user_id'])) {
-            try {
-                $this->db->dbQuery("DELETE FROM articles WHERE id = :id", $params);
-
-                // store pop up msg in session
-                Session::set('pop_up', [
-                    'message' => 'Article deleted'
-                ]);
-
-                //redirect user 
-                redirectUser("/$this->backPath");
-            } catch (Exception $e) {
-                ErrorController::randomError();
-                exit;
-            }
+            $this->deleteArticle($params, $this->backPath);
         } else {
             ErrorController::accessDenied();
             exit;

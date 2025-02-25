@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Framework\Database;
+use Framework\Session;
 use App\Controllers\ErrorController;
 use Exception;
 
@@ -18,7 +19,7 @@ class ArticlesModels extends Database
         $this->db = new Database($config);
     }
 
-    // FETCH ARTICLES FROM DB - can be used in multiple class methods
+    // FETCH ARTICLES FROM DB
     protected function fetchArticles(string $updatedQuery, array $params = []): array
     {
         try {
@@ -29,7 +30,7 @@ class ArticlesModels extends Database
         }
     }
 
-    // FETCH SELECTED ARTICLE FROM DB - can be used in multiple class methods
+    // FETCH SELECTED ARTICLE FROM DB
     protected function fetchSelectedArticle(array $params): array
     {
         // get selected article - params
@@ -66,13 +67,129 @@ class ArticlesModels extends Database
         return $selectedArticleAuthor;
     }
 
-    // FETCH BOOKMARKED ARTICLE FROM DB 
-    protected function fetchBookmarkedArticles(array $bookmarkParams): array
+    // CREATE NEW ARTICLE IN DB - author user
+    protected function createArticle(array $newArticleData): void
+    {
+        try {
+            $query = "INSERT INTO articles (`title`, `description`, `section_one`, `section_two`,
+            `section_three`, `created_at`, `user_id`, `status`) VALUES (:title, :description, :section_one, :section_two, :section_three, :created_at, :user_id, :status )";
+
+            $this->db->dbQuery($query, $newArticleData);
+        } catch (Exception $e) {
+            ErrorController::randomError('Error while submitting article');
+            exit;
+        }
+    }
+
+    // APPROVE ARTICLE - UPDATE ARTICLE IN DB - admin user
+    protected function approveArticle(array $articleParams): void
+    {
+        try {
+            $this->db->dbQuery("UPDATE articles SET `status` = 'active' WHERE id = :id", $articleParams);
+
+            // store pop up msg in session
+            Session::set('pop_up', [
+                'message' => 'Article approved'
+            ]);
+
+            //redirect user 
+            redirectUser('/pending_articles');
+        } catch (Exception $e) {
+            ErrorController::randomError();
+            exit;
+        }
+    }
+
+    // UPDATE ARTICLE IN DB - author & admin user
+    protected function editArticle(string $updateArticleQuery, array $updatedSelectedArticle): void
+    {
+        try {
+            $this->db->dbQuery($updateArticleQuery, $updatedSelectedArticle);
+        } catch (Exception $e) {
+            ErrorController::randomError('Error while editing article');
+            exit;
+        }
+    }
+
+    // DELETE ARTICLE FROM DB - author & admin user
+    protected function deleteArticle(array $articleParams, string $backPath): void
+    {
+        try {
+            $this->db->dbQuery("DELETE FROM articles WHERE id = :id", $articleParams);
+
+            // store pop up msg in session
+            Session::set('pop_up', [
+                'message' => 'Article deleted'
+            ]);
+
+            //redirect user 
+            redirectUser("/$backPath");
+        } catch (Exception $e) {
+            ErrorController::randomError();
+            exit;
+        }
+    }
+
+    // CHECK IF ARTICLE BOOKMARKED - reader user
+    protected function isBookmarkedArticles(array $bookmarkParams): bool | array
     {
         try {
             return $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams)->fetch();
         } catch (Exception $e) {
             ErrorController::randomError();
+            exit;
+        }
+    }
+
+    // FETCH BOOKMARKED ARTICLE - reader user
+    protected function fetchBookmarkedArticles(array $user): array | null
+    {
+        (array) $userId = [
+            'id' => $user['id'] ?? null
+        ];
+
+        try {
+            return $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :id", $userId)->fetchAll();
+        } catch (Exception $e) {
+            ErrorController::randomError('There was an error while displaying user bookmarked articles');
+            exit;
+        }
+    }
+
+    // BOOKMARK ARTICLE - SAVE ARTICLE IN bookmarked TABLE - reader user
+    protected function addBookmark(array $bookmarkParams, string $backPath, string $articleId)
+    {
+        try {
+            $this->db->dbQuery("DELETE FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams);
+
+            // store pop up msg in session
+            Session::set('pop_up', [
+                'message' => 'Bookmark removed'
+            ]);
+
+            //redirect user 
+            redirectUser("/$backPath/" . $articleId);
+        } catch (Exception $e) {
+            ErrorController::randomError('There was an error while removing the bookmark');
+            exit;
+        }
+    }
+
+    // REMOVE BOOKMARK ARTICLE - DELETE ARTICLE FROM bookmarked TABLE - reader user
+    protected function removeBookmark(array $newBookmark, string $backPath, string $articleId)
+    {
+        try {
+            $this->db->dbQuery("INSERT INTO bookmarked (`user_id`, `article_id`, `created_at`) VALUES (:user_id, :article_id, :created_at)", $newBookmark);
+
+            // store pop up msg in session
+            Session::set('pop_up', [
+                'message' => 'Article bookmarked'
+            ]);
+
+            //redirect user 
+            redirectUser("/$backPath/" . $articleId);
+        } catch (Exception $e) {
+            ErrorController::randomError('There was an error while bookmarking the article');
             exit;
         }
     }
