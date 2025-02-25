@@ -4,29 +4,18 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use Exception;
-use Framework\Database;
+use App\Models\ArticlesModels;
 
-class HomeController extends Database
+class HomeController extends ArticlesModels
 {
-    private Database $db;
-
-    public function __construct()
-    {
-        $config = require basePath('config/db.php');
-        $this->db = new Database($config);
-    }
-
     public function latestArticles(): void
     {
-        try {
-            $articles = $this->db->dbQuery("SELECT * FROM articles WHERE `status` = 'active' ORDER BY created_at DESC LIMIT 3")->fetchAll();
+        $updatedQuery = "`status` = 'active' ORDER BY created_at DESC LIMIT 3";
 
-            loadView('home', [
-                'articles' => $articles
-            ]);
-        } catch (Exception $e) {
-            ErrorController::randomError('Error while retrieving latest articles');
-        }
+        $articles = $this->fetchArticles($updatedQuery);
+
+        loadView('home', [
+            'articles' => $articles ?? ''
+        ]);
     }
 }

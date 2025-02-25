@@ -4,69 +4,31 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use Framework\Database;
+use App\Models\ArticlesModels;
 use Framework\Session;
-use Exception;
 
-class ArticlesController extends Database
+class ArticlesController extends ArticlesModels
 {
-    protected Database $db;
     private int $limit;
 
     public function __construct()
     {
-        $config = require basePath('config/db.php');
-        $this->db = new Database($config);
+        parent::__construct();
 
         $this->limit = (int) $_ENV['LIMIT'];
-    }
-
-    // FETCH ARTICLES FROM DB - can be used in multiple class methods
-    protected function fetchArticles(string $updatedQuery, string $pageTitle, array $params = []): void
-    {
-        try {
-            $articles = $this->db->dbQuery("SELECT * FROM articles WHERE {$updatedQuery}", $params)->fetchAll();
-
-            loadView('articles', [
-                'articles' => $articles,
-                'pageTitle' => $pageTitle
-            ]);
-        } catch (Exception $e) {
-            ErrorController::randomError('Error while retrieving articles');
-            exit;
-        }
-    }
-
-    // FETCH SELECTED ARTICLE FROM DB - can be used in multiple class methods
-    protected function fetchSelectedArticle(array $params): array
-    {
-        // get selected article - params
-        (string) $id = $params['id'] ?? '';
-        (array) $articleId = [
-            'id' => $id
-        ];
-
-        try {
-            $selectedArticle = $this->db->dbQuery("SELECT * FROM articles WHERE id = :id", $articleId)->fetch();
-
-            // display not found if selected article does not exist
-            if (!$selectedArticle) {
-                ErrorController::notFound();
-                exit;
-            };
-
-            // if exist - return selected article
-            return $selectedArticle;
-        } catch (Exception $e) {
-            ErrorController::randomError();
-            exit;
-        }
     }
 
     // DISPLAY ALL ACTIVE ARTICLES PAGE
     public function displayArticlesPage(): void
     {
-        $this->fetchArticles("`status` = 'active' ORDER BY created_at DESC LIMIT {$this->limit}", 'All News');
+        $updatedQuery = "`status` = 'active' ORDER BY created_at DESC LIMIT {$this->limit}";
+
+        $articles = $this->fetchArticles($updatedQuery);
+
+        loadView('articles', [
+            'pageTitle' => 'All News',
+            'articles' => $articles ?? ''
+        ]);
     }
 
     // SEARCH FEATURE FOR THE ALL ACTIVE ARTICLES PAGE
@@ -86,17 +48,12 @@ class ArticlesController extends Database
         }
 
         // if all is good
-        try {
-            $query = "SELECT * FROM articles WHERE title LIKE :title";
-            $params = [
-                'title' => "%{$title}%",
-            ];
+        $updatedQuery = "title LIKE :title";
+        $params = [
+            'title' => "%{$title}%",
+        ];
 
-            $articles = $this->db->dbQuery($query, $params)->fetchAll();
-        } catch (Exception $e) {
-            ErrorController::randomError('Error while retrieving articles');
-            exit;
-        }
+        $articles = $this->fetchArticles($updatedQuery, $params);
 
         // load view
         if (empty($articles)) {
@@ -121,15 +78,14 @@ class ArticlesController extends Database
     {
         $offset = isset($_POST['offset']) ? (int) $_POST['offset'] : 0;
 
-        try {
-            $articles = $this->db->dbQuery("SELECT * FROM articles WHERE `status` = 'active' ORDER BY created_at DESC LIMIT {$this->limit} OFFSET {$offset}")->fetchAll();
+        $updatedQuery = "`status` = 'active' ORDER BY created_at DESC LIMIT {$this->limit} OFFSET {$offset}";
 
+        $articles = $this->fetchArticles($updatedQuery);
+
+        if (!empty($articles)) {
             foreach ($articles as $article) {
                 loadPartial('articleCard', ['article' => $article]);
             }
-        } catch (Exception $e) {
-            ErrorController::randomError('Error while retrieving articles');
-            exit;
         }
     }
 
@@ -143,14 +99,10 @@ class ArticlesController extends Database
             'user_id' => $selectedArticle['user_id']
         ];
 
-        try {
-            $selectedArticleAuthor = $this->db->dbQuery("SELECT DISTINCT `name` FROM users WHERE id = :user_id", $authorParams)->fetch();
-        } catch (Exception $e) {
-            $selectedArticleAuthor = '';
-        }
+        $selectedArticleAuthor = $this->fetchSelectedArticleAuthor($authorParams);
 
+        // check if article is bookmarked - READER USER ONLY
         if (Session::exist('user') && Session::get('user')['role'] == 'reader') {
-            // check if article is bookmarked - READER USER ONLY
             $articleBookmarked = false;
             $userId = Session::get('user')['id'] ?? '';
             $articleId = $params['id'] ?? '';
@@ -160,12 +112,7 @@ class ArticlesController extends Database
                 'article_id' => $articleId
             ];
 
-            try {
-                $bookmarkedArticle = $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams)->fetch();
-            } catch (Exception $e) {
-                ErrorController::randomError();
-                exit;
-            }
+            $bookmarkedArticle = $this->fetchBookmarkedArticles($bookmarkParams);
 
             // if bookmarked
             if ($bookmarkedArticle) {
