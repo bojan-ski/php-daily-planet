@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Models\ArticlesModels;
+use App\Models\UsersModels;
 use Framework\Session;
-use Exception;
 
 class ReaderUserController extends ArticlesModels
 {
@@ -26,7 +26,7 @@ class ReaderUserController extends ArticlesModels
     {
         if (isset($this->user)) {
             // get all bookmarked articles (ids) from bookmarked table 
-            $bookmarkedArticlesIds = $this->fetchBookmarkedArticles($this->user);
+            $bookmarkedArticlesIds = $this->fetchBookmarkedArticlesId($this->user);
 
             // if reader user has bookmarked articles
             if ($bookmarkedArticlesIds) {
@@ -42,9 +42,7 @@ class ReaderUserController extends ArticlesModels
                     $params[$key] = $id;
                 }
 
-                $query = "SELECT * FROM articles WHERE id IN (" . implode(', ', $placeholders) . ")";
-
-                // $bookmarkedArticles = $this->fetchArticles($query, $params);
+                $bookmarkedArticles = $this->fetchBookmarkedArticles($placeholders, $params);
             }
 
             // load view
@@ -61,29 +59,29 @@ class ReaderUserController extends ArticlesModels
     public function bookmarkFeature(array $params): void
     {
         if (isset($this->user)) {
-            $userId = (string) Session::get('user')['id'] ?? '';
-            $articleId = (string) $params['id'] ?? '';
+            $userId = $this->user['id'] ?? '';
+            $articleId = $params['id'] ?? '';
 
             // check if article is bookmarked
-            (array) $bookmarkParams = [
+            $bookmarkParams = [
                 'user_id' => $userId,
                 'article_id' => $articleId
             ];
 
-                $isBookmarked = $this->isArticleBookmarked($bookmarkParams);
+            $isBookmarked = $this->isArticleBookmarked($bookmarkParams);
 
             // if bookmarked
             if ($isBookmarked) {
-                $this->addBookmark($bookmarkParams, $this->backPath, $params['id']);
+                $this->addBookmark($bookmarkParams, $this->backPath, $articleId);
             } else {
                 // if not bookmarked
-                (array) $newBookmark = [
+                $newBookmark = [
                     'user_id' => $userId,
                     'article_id' => $articleId,
                     'created_at' => date("Y-m-d h:i:s")
                 ];
 
-                $this->removeBookmark($newBookmark, $this->backPath, $params['id'] );
+                $this->removeBookmark($newBookmark, $this->backPath, $articleId);
             }
         } else {
             ErrorController::randomError('You not able to perform the following action!');
@@ -95,27 +93,16 @@ class ReaderUserController extends ArticlesModels
     {
         if (isset($this->user)) {
             // get all bookmarked articles (ids) from bookmarked table 
-            $bookmarkedArticlesIds = $this->fetchBookmarkedArticles($this->user);
+            $bookmarkedArticlesIds = $this->fetchBookmarkedArticlesId($this->user);
 
             if (empty($bookmarkedArticlesIds)) {
                 // get reader user id
-                (array) $userId = [
+                $userId = [
                     'id' => $this->user['id'] ?? null
                 ];
 
-                try {
-                    // delete account from db
-                    $this->dbQuery("DELETE FROM users WHERE id = :id", $userId);
-
-                    // delete user data from session
-                    Session::clearAll();
-
-                    //redirect user 
-                    redirectUser("/");
-                } catch (Exception $e) {
-                    ErrorController::randomError('User does not exist');
-                    exit;
-                }
+                $delete = new UsersModels;
+                $delete->deleteReaderUserAccount($userId);
             } else {
                 // store pop up msg in session
                 Session::set('pop_up', [

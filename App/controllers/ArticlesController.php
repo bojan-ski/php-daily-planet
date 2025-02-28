@@ -21,9 +21,7 @@ class ArticlesController extends ArticlesModels
     // DISPLAY ALL ACTIVE ARTICLES PAGE
     public function displayArticlesPage(): void
     {
-        $updatedQuery = "`status` = 'active' ORDER BY created_at DESC LIMIT {$this->limit}";
-
-        $articles = $this->fetchArticles($updatedQuery);
+        $articles = $this->fetchArticlesForArticlesPage($this->limit);
 
         loadView('articles', [
             'pageTitle' => 'All News',
@@ -48,12 +46,7 @@ class ArticlesController extends ArticlesModels
         }
 
         // if all is good
-        $updatedQuery = "title LIKE :title";
-        $params = [
-            'title' => "%{$title}%",
-        ];
-
-        $articles = $this->fetchArticles($updatedQuery, $params);
+        $articles = $this->searchResults($title);
 
         // load view
         if (empty($articles)) {
@@ -66,8 +59,8 @@ class ArticlesController extends ArticlesModels
             redirectUser("/articles");
         } else {
             loadView('articles', [
-                'articles' => $articles,
                 'pageTitle' => 'All News',
+                'articles' => $articles,
                 'search' => $title
             ]);
         }
@@ -78,9 +71,7 @@ class ArticlesController extends ArticlesModels
     {
         $offset = isset($_POST['offset']) ? (int) $_POST['offset'] : 0;
 
-        $updatedQuery = "`status` = 'active' ORDER BY created_at DESC LIMIT {$this->limit} OFFSET {$offset}";
-
-        $articles = $this->fetchArticles($updatedQuery);
+        $articles = $this->pagination($this->limit, $offset);
 
         if (!empty($articles)) {
             foreach ($articles as $article) {
@@ -103,21 +94,15 @@ class ArticlesController extends ArticlesModels
 
         // check if article is bookmarked - READER USER ONLY
         if (Session::exist('user') && Session::get('user')['role'] == 'reader') {
-            $articleBookmarked = false;
             $userId = Session::get('user')['id'] ?? '';
             $articleId = $params['id'] ?? '';
 
-            (array) $bookmarkParams = [
+            $bookmarkParams = [
                 'user_id' => $userId,
                 'article_id' => $articleId
             ];
 
-            $bookmarkedArticle = $this->isArticleBookmarked($bookmarkParams);
-
-            // if bookmarked
-            if ($bookmarkedArticle) {
-                $articleBookmarked = true;
-            }
+            $articleBookmarked = $this->isArticleBookmarked($bookmarkParams);
 
             // display page - view
             loadView('selectedArticle', [

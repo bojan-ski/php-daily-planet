@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Framework;
 
-class FlashMsg{
+class FlashMsg
+{
     public static function displayPopUp(string $key): string | null
     {
         $message = Session::get($key);

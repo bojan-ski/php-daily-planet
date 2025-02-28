@@ -11,7 +11,7 @@ use App\Controllers\ErrorController;
 
 class Database
 {
-    private PDO $conn;
+    protected PDO $conn;
 
     public function __construct()
     {

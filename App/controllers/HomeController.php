@@ -10,9 +10,7 @@ class HomeController extends ArticlesModels
 {
     public function latestArticles(): void
     {
-        $updatedQuery = "`status` = 'active' ORDER BY created_at DESC LIMIT 3";
-
-        $articles = $this->fetchArticles($updatedQuery);
+        $articles = $this->fetchArticlesForHomePage();
 
         loadView('home', [
             'articles' => $articles ?? ''

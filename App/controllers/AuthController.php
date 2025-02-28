@@ -5,17 +5,10 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Models\UsersModels;
-use Framework\Database;
 use Framework\Session;
-use Exception;
 
 class AuthController extends UsersModels
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function displaySignUpPage(): void
     {
         loadView('auth/signUp');
@@ -28,10 +21,10 @@ class AuthController extends UsersModels
 
     public function register(): void
     {
-        $name = isset($_POST['name']) ? (string) $_POST['name'] : '';
-        $email = isset($_POST['email']) ? (string) $_POST['email'] : '';
-        $password = isset($_POST['password']) ? (string) $_POST['password'] : '';
-        $passwordConfirmation = isset($_POST['password_confirmation']) ? (string) $_POST['password_confirmation'] : '';
+        $name = isset($_POST['name']) ? $_POST['name'] : '';
+        $email = isset($_POST['email']) ? $_POST['email'] : '';
+        $password = isset($_POST['password']) ? $_POST['password'] : '';
+        $passwordConfirmation = isset($_POST['password_confirmation']) ? $_POST['password_confirmation'] : '';
 
         // check user form data & display error if exist
         $errors = [];
@@ -66,13 +59,13 @@ class AuthController extends UsersModels
         }
 
         // check if email is taken
-        (array) $emailParams = [
+        $emailParams = [
             'email' => $email
         ];
 
         $emailTaken = $this->isEmailTaken($emailParams);
 
-        if (isset($emailTaken) && !empty($emailTaken['email'])) {
+        if ($emailTaken) {
             $errors['email'] = 'Email your provided is in use.';
 
             loadView('auth/signUp', [
@@ -86,7 +79,7 @@ class AuthController extends UsersModels
         }
 
         // if all is good -> store new user in db
-        (array) $newUser = [
+        $newUser = [
             'name' => $name,
             'email' => $email,
             'password' => password_hash($password, PASSWORD_BCRYPT),
@@ -118,8 +111,8 @@ class AuthController extends UsersModels
 
     public function login(): void
     {
-        $email = isset($_POST['email']) ? (string) $_POST['email'] : '';
-        $password = isset($_POST['password']) ? (string) $_POST['password'] : '';
+        $email = isset($_POST['email']) ? $_POST['email'] : '';
+        $password = isset($_POST['password']) ? $_POST['password'] : '';
 
         // check user form data & display error if exist
         $errors = [];
@@ -142,7 +135,7 @@ class AuthController extends UsersModels
         }
 
         // check email
-        (array) $emailParams = [
+        $emailParams = [
             'email' => $email
         ];
 

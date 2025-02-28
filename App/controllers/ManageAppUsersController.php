@@ -9,16 +9,6 @@ use Framework\Session;
 
 class ManageAppUsersController extends UsersModels
 {
-    private bool $adminUser;
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->adminUser = (Session::exist('user') && Session::get('user')['role'] == 'admin') ? true : false;
-    }
-
-
     public function displayAuthorsPage(): void
     {
         $authorUsers = $this->fetchUsers('author', 'Error while retrieving all author users');
@@ -30,15 +20,14 @@ class ManageAppUsersController extends UsersModels
 
     public function removeAuthor(): void
     {
-        if ($this->adminUser) {
-            (array) $authorId = [
+        if (Session::exist('user') && Session::get('user')['role'] === 'admin') {
+            $authorId = [
                 'id' => $_POST['author_id'] ?? null
             ];
 
             $this->deleteAuthorFromDB($authorId);
         } else {
             ErrorController::accessDenied();
-            exit;
         }
     }
 
@@ -49,10 +38,10 @@ class ManageAppUsersController extends UsersModels
 
     public function addAuthor(): void
     {
-        if ($this->adminUser) {
-            $name = isset($_POST['name']) ? (string) $_POST['name'] : '';
-            $email = isset($_POST['email']) ? (string) $_POST['email'] : '';
-            $password = isset($_POST['password']) ? (string) $_POST['password'] : '';
+        if (Session::exist('user') && Session::get('user')['role'] === 'admin') {
+            $name = isset($_POST['name']) ? $_POST['name'] : '';
+            $email = isset($_POST['email']) ? $_POST['email'] : '';
+            $password = isset($_POST['password']) ? $_POST['password'] : '';
 
             // check form data & display error if exist
             $errors = [];
@@ -79,13 +68,13 @@ class ManageAppUsersController extends UsersModels
             }
 
             // check if email is taken
-            (array) $emailParams = [
+            $emailParams = [
                 'email' => $email
             ];
 
             $emailTaken = $this->isEmailTaken($emailParams);
 
-            if (isset($emailTaken) && !empty($emailTaken['email'])) {
+            if ($emailTaken) {
                 $errors['email'] = 'Email your provided is in use.';
 
                 loadView('/adminUser/addAuthor', [
@@ -99,7 +88,7 @@ class ManageAppUsersController extends UsersModels
             }
 
             // if all is good -> store new author user in db
-            (array) $newAuthorUser = [
+            $newAuthorUser = [
                 'name' => $name,
                 'email' => $email,
                 'password' => password_hash($password, PASSWORD_BCRYPT),
@@ -118,7 +107,6 @@ class ManageAppUsersController extends UsersModels
             redirectUser('/authors');
         } else {
             ErrorController::accessDenied();
-            exit;
         }
     }
 

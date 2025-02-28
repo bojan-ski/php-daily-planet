@@ -4,37 +4,29 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Framework\Database;
 use App\Controllers\ErrorController;
-use Exception;
+use Framework\Database;
 use Framework\Session;
+use Exception;
 
 class UsersModels extends Database
 {
-    private Database $db;
-
-    public function __construct()
-    {
-        $config = require basePath('config/db.php');
-        $this->db = new Database($config);
-    }
-
     // CHECK DB IF EMAIL IS TAKEN
     protected function isEmailTaken(array $emailParams): bool
     {
         try {
-            return $this->db->dbQuery("SELECT DISTINCT `email` FROM users WHERE email = :email", $emailParams)->fetch();
+            return (bool) $this->dbQuery("SELECT DISTINCT `email` FROM users WHERE email = :email", $emailParams)->fetch();
         } catch (Exception $e) {
             ErrorController::randomError('Error while creating account');
             exit;
         }
     }
 
-    // CREATE NEW USER IN DB
+    // CREATE/ADD NEW USER
     protected function createUser(array $newUserData): void
     {
         try {
-            $this->db->dbQuery("INSERT INTO users (`name`, `email`, `password`, `created_at`, `role`) VALUES (:name, :email, :password, :created_at, :role)", $newUserData);
+            $this->dbQuery("INSERT INTO users (`name`, `email`, `password`, `created_at`, `role`) VALUES (:name, :email, :password, :created_at, :role)", $newUserData);
         } catch (Exception $e) {
             ErrorController::randomError('Error while creating account');
             exit;
@@ -42,10 +34,10 @@ class UsersModels extends Database
     }
 
     // RETURN NEW USER ID FROM DB
-    protected function newUserID(): ?string 
+    protected function newUserID(): string
     {
         try {
-            return $this->db->conn->lastInsertId();
+            return $this->conn->lastInsertId();
         } catch (Exception $e) {
             ErrorController::randomError('Error while creating account');
             exit;
@@ -53,10 +45,10 @@ class UsersModels extends Database
     }
 
     // CHECK DB IF USER EXISTS
-    protected function userExists(array $emailParams): array 
+    protected function userExists(array $emailParams): array
     {
         try {
-            return $this->db->dbQuery("SELECT * FROM users WHERE email = :email", $emailParams)->fetch();
+            return $this->dbQuery("SELECT * FROM users WHERE email = :email", $emailParams)->fetch();
         } catch (Exception $e) {
             ErrorController::randomError('Error while login');
             exit;
@@ -67,7 +59,7 @@ class UsersModels extends Database
     protected function fetchUsers(string $role, string $errorMessage): array
     {
         try {
-            return $this->db->dbQuery("SELECT id, name, email, created_at FROM users WHERE `role` = '{$role}' ORDER BY created_at DESC")->fetchAll();
+            return $this->dbQuery("SELECT id, name, email, created_at FROM users WHERE `role` = '{$role}' ORDER BY created_at DESC")->fetchAll();
         } catch (Exception $e) {
             ErrorController::randomError($errorMessage);
             exit;
@@ -80,7 +72,7 @@ class UsersModels extends Database
         if (isset($authorId['id'])) {
             try {
                 // delete author user from db
-                $this->db->dbQuery("DELETE FROM users WHERE id = :id", $authorId);
+                $this->dbQuery("DELETE FROM users WHERE id = :id", $authorId);
 
                 // store pop up msg in session
                 Session::set('pop_up', [
@@ -95,6 +87,23 @@ class UsersModels extends Database
             }
         } else {
             ErrorController::randomError();
+            exit;
+        }
+    }
+
+    public function deleteReaderUserAccount(array $userId): void
+    {
+        try {
+            // delete account from db
+            $this->dbQuery("DELETE FROM users WHERE id = :id", $userId);
+
+            // delete user data from session
+            Session::clearAll();
+
+            //redirect user 
+            redirectUser("/");
+        } catch (Exception $e) {
+            ErrorController::randomError('User does not exist');
             exit;
         }
     }

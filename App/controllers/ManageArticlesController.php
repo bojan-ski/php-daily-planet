@@ -19,16 +19,14 @@ class ManageArticlesController extends ArticlesController
         $this->userId = [
             'id' => Session::get('user')['id']
         ];
-        
+
         $this->backPath = getPagePaths()[0];
     }
 
     // DISPLAY ALL AUTHOR ACTIVE ARTICLES PAGE - author user
     public function displayAuthorActiveArticlesPage(): void
     {
-        $updatedQuery = "`status` = 'active' AND `user_id` = :id ORDER BY created_at DESC";
-
-        $this->fetchArticles($updatedQuery, $this->userId);
+        $articles = $this->fetchAuthorActiveArticles($this->userId);
 
         loadView('articles', [
             'pageTitle' => 'My active articles',
@@ -39,25 +37,10 @@ class ManageArticlesController extends ArticlesController
     // DISPLAY ALL AUTHOR PENDING ARTICLES PAGE - author user
     public function displayAuthorPendingArticlesPage(): void
     {
-        $updatedQuery = "`status` = 'pending' AND `user_id` = :id ORDER BY created_at DESC";
-
-        $this->fetchArticles($updatedQuery, $this->userId);
+        $articles = $this->fetchAuthorPendingArticles($this->userId);
 
         loadView('articles', [
             'pageTitle' => 'My pending articles',
-            'articles' => $articles ?? ''
-        ]);
-    }
-
-    // DISPLAY ALL PENDING ARTICLES PAGE - admin user
-    public function displayAllPendingArticlesPage(): void
-    {
-        $updatedQuery = "`status` = 'pending' ORDER BY created_at DESC";
-
-        $this->fetchArticles($updatedQuery);
-
-        loadView('articles', [
-            'pageTitle' => 'All pending articles',
             'articles' => $articles ?? ''
         ]);
     }
@@ -72,11 +55,11 @@ class ManageArticlesController extends ArticlesController
     public function submitArticle(): void
     {
         if (Session::exist('user') && Session::get('user')['role'] == 'author') {
-            $title = isset($_POST['title']) ? (string) $_POST['title'] : '';
-            $description = isset($_POST['description']) ? (string) $_POST['description'] : '';
-            $section_one = isset($_POST['section_one']) ? (string) $_POST['section_one'] : '';
-            $section_two = isset($_POST['section_two']) ? (string) $_POST['section_two'] : null;
-            $section_three = isset($_POST['section_three']) ? (string) $_POST['section_three'] : null;
+            $title = isset($_POST['title']) ? $_POST['title'] : '';
+            $description = isset($_POST['description']) ? $_POST['description'] : '';
+            $section_one = isset($_POST['section_one']) ? $_POST['section_one'] : '';
+            $section_two = isset($_POST['section_two']) ? $_POST['section_two'] : null;
+            $section_three = isset($_POST['section_three']) ? $_POST['section_three'] : null;
 
             // check form data & display error if exist
             $errors = [];
@@ -112,7 +95,7 @@ class ManageArticlesController extends ArticlesController
             }
 
             // if all is good -> submit article -> store in db
-            (array) $newArticle = [
+            $newArticle = [
                 'title' => $title,
                 'description' => $description,
                 'section_one' => $section_one,
@@ -123,7 +106,7 @@ class ManageArticlesController extends ArticlesController
                 'status' => 'pending'
             ];
 
-            $this->createArticle($newArticle);
+            $this->createNewArticle($newArticle);
 
             // store pop up msg in session
             Session::set('pop_up', [
@@ -132,19 +115,6 @@ class ManageArticlesController extends ArticlesController
 
             //redirect user 
             redirectUser('/my_pending_articles');
-        } else {
-            ErrorController::accessDenied();
-            exit;
-        }
-    }
-
-    // APPROVE ARTICLE METHOD - admin user
-    public function approveSelectedArticle(array $params): void
-    {
-        (array) $selectedArticle = $this->fetchSelectedArticle($params);
-
-        if (HasPermission::approveOption($selectedArticle['status'])) {
-            $this->approveArticle($params);
         } else {
             ErrorController::accessDenied();
             exit;
@@ -174,9 +144,9 @@ class ManageArticlesController extends ArticlesController
         }
 
         // if user has permission to edit
-        (string) $title = isset($_POST['title']) ? $_POST['title'] : '';
-        (string) $description = isset($_POST['description']) ? $_POST['description'] : '';
-        (string) $section_one = isset($_POST['section_one']) ? $_POST['section_one'] : '';
+        $title = isset($_POST['title']) ? $_POST['title'] : '';
+        $description = isset($_POST['description']) ? $_POST['description'] : '';
+        $section_one = isset($_POST['section_one']) ? $_POST['section_one'] : '';
         $section_two = isset($_POST['section_two']) ? $_POST['section_two'] : null;
         $section_three = isset($_POST['section_three']) ? $_POST['section_three'] : null;
 
@@ -215,7 +185,7 @@ class ManageArticlesController extends ArticlesController
         }
 
         // if all is good -> submit edited article -> update article in db
-        (array) $updatedSelectedArticle = [
+        $updatedSelectedArticle = [
             'id' => $selectedArticle['id'],
             'title' => $title,
             'description' => $description,
@@ -225,16 +195,7 @@ class ManageArticlesController extends ArticlesController
             'created_at' => date("Y-m-d h:i:s")
         ];
 
-        $updateArticleQuery = "UPDATE articles 
-            SET title = :title, 
-                description = :description, 
-                section_one = :section_one, 
-                section_two = :section_two, 
-                section_three = :section_three,
-                created_at = :created_at
-            WHERE id = :id";
-
-        $this->editArticle($updateArticleQuery, $updatedSelectedArticle);
+        $this->editArticle($updatedSelectedArticle);
 
         // store pop up msg in session
         Session::set('pop_up', [
@@ -253,6 +214,30 @@ class ManageArticlesController extends ArticlesController
 
         if (HasPermission::isAllowed($selectedArticle['user_id'])) {
             $this->deleteArticle($params, $this->backPath);
+        } else {
+            ErrorController::accessDenied();
+            exit;
+        }
+    }
+
+    // DISPLAY ALL PENDING ARTICLES PAGE - admin user
+    public function displayAllPendingArticlesPage(): void
+    {
+        $articles = $this->fetchAllPendingArticles();
+
+        loadView('articles', [
+            'pageTitle' => 'All pending articles',
+            'articles' => $articles ?? ''
+        ]);
+    }
+
+    // APPROVE ARTICLE METHOD - admin user
+    public function approveSelectedArticle(array $params): void
+    {
+        $selectedArticle = $this->fetchSelectedArticle($params);
+
+        if (HasPermission::approveOption($selectedArticle['status'])) {
+            $this->approveArticle($params);
         } else {
             ErrorController::accessDenied();
             exit;
