@@ -11,19 +11,11 @@ use Exception;
 
 class ArticlesModels extends Database
 {
-    private Database $db;
-
-    public function __construct()
-    {
-        $config = require basePath('config/db.php');
-        $this->db = new Database($config);
-    }
-
     // FETCH ARTICLES FROM DB
     protected function fetchArticles(string $updatedQuery, array $params = []): array
     {
         try {
-            return $this->db->dbQuery("SELECT * FROM articles WHERE {$updatedQuery}", $params)->fetchAll();
+            return $this->dbQuery("SELECT * FROM articles WHERE {$updatedQuery}", $params)->fetchAll();
         } catch (Exception $e) {
             ErrorController::randomError('Error while retrieving articles');
             exit;
@@ -39,7 +31,7 @@ class ArticlesModels extends Database
         ];
 
         try {
-            $selectedArticle = $this->db->dbQuery("SELECT * FROM articles WHERE id = :id", $articleId)->fetch();
+            $selectedArticle = $this->dbQuery("SELECT * FROM articles WHERE id = :id", $articleId)->fetch();
 
             // display not found if selected article does not exist
             if (!$selectedArticle) {
@@ -59,7 +51,7 @@ class ArticlesModels extends Database
     protected function fetchSelectedArticleAuthor(array $authorParams): array | string
     {
         try {
-            $selectedArticleAuthor = $this->db->dbQuery("SELECT DISTINCT `name` FROM users WHERE id = :user_id", $authorParams)->fetch();
+            $selectedArticleAuthor = $this->dbQuery("SELECT DISTINCT `name` FROM users WHERE id = :user_id", $authorParams)->fetch();
         } catch (Exception $e) {
             $selectedArticleAuthor = '';
         }
@@ -74,7 +66,7 @@ class ArticlesModels extends Database
             $query = "INSERT INTO articles (`title`, `description`, `section_one`, `section_two`,
             `section_three`, `created_at`, `user_id`, `status`) VALUES (:title, :description, :section_one, :section_two, :section_three, :created_at, :user_id, :status )";
 
-            $this->db->dbQuery($query, $newArticleData);
+            $this->dbQuery($query, $newArticleData);
         } catch (Exception $e) {
             ErrorController::randomError('Error while submitting article');
             exit;
@@ -85,7 +77,7 @@ class ArticlesModels extends Database
     protected function approveArticle(array $articleParams): void
     {
         try {
-            $this->db->dbQuery("UPDATE articles SET `status` = 'active' WHERE id = :id", $articleParams);
+            $this->dbQuery("UPDATE articles SET `status` = 'active' WHERE id = :id", $articleParams);
 
             // store pop up msg in session
             Session::set('pop_up', [
@@ -104,7 +96,7 @@ class ArticlesModels extends Database
     protected function editArticle(string $updateArticleQuery, array $updatedSelectedArticle): void
     {
         try {
-            $this->db->dbQuery($updateArticleQuery, $updatedSelectedArticle);
+            $this->dbQuery($updateArticleQuery, $updatedSelectedArticle);
         } catch (Exception $e) {
             ErrorController::randomError('Error while editing article');
             exit;
@@ -115,7 +107,7 @@ class ArticlesModels extends Database
     protected function deleteArticle(array $articleParams, string $backPath): void
     {
         try {
-            $this->db->dbQuery("DELETE FROM articles WHERE id = :id", $articleParams);
+            $this->dbQuery("DELETE FROM articles WHERE id = :id", $articleParams);
 
             // store pop up msg in session
             Session::set('pop_up', [
@@ -131,10 +123,10 @@ class ArticlesModels extends Database
     }
 
     // CHECK IF ARTICLE BOOKMARKED - reader user
-    protected function isBookmarkedArticles(array $bookmarkParams): bool | array
+    protected function isArticleBookmarked(array $bookmarkParams): bool | array
     {
         try {
-            return $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams)->fetch();
+            return $this->dbQuery("SELECT * FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams)->fetch();
         } catch (Exception $e) {
             ErrorController::randomError();
             exit;
@@ -149,7 +141,7 @@ class ArticlesModels extends Database
         ];
 
         try {
-            return $this->db->dbQuery("SELECT * FROM bookmarked WHERE user_id = :id", $userId)->fetchAll();
+            return $this->dbQuery("SELECT * FROM bookmarked WHERE user_id = :id", $userId)->fetchAll();
         } catch (Exception $e) {
             ErrorController::randomError('There was an error while displaying user bookmarked articles');
             exit;
@@ -160,7 +152,7 @@ class ArticlesModels extends Database
     protected function addBookmark(array $bookmarkParams, string $backPath, string $articleId)
     {
         try {
-            $this->db->dbQuery("DELETE FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams);
+            $this->dbQuery("DELETE FROM bookmarked WHERE user_id = :user_id AND article_id = :article_id", $bookmarkParams);
 
             // store pop up msg in session
             Session::set('pop_up', [
@@ -179,7 +171,7 @@ class ArticlesModels extends Database
     protected function removeBookmark(array $newBookmark, string $backPath, string $articleId)
     {
         try {
-            $this->db->dbQuery("INSERT INTO bookmarked (`user_id`, `article_id`, `created_at`) VALUES (:user_id, :article_id, :created_at)", $newBookmark);
+            $this->dbQuery("INSERT INTO bookmarked (`user_id`, `article_id`, `created_at`) VALUES (:user_id, :article_id, :created_at)", $newBookmark);
 
             // store pop up msg in session
             Session::set('pop_up', [

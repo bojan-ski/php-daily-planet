@@ -1,5 +1,6 @@
 <?php
 
+use Framework\FlashMsg;
 use Framework\Session;
 
 ?>
@@ -8,7 +9,7 @@ use Framework\Session;
     <div class="pop-up-msg">
         <div class="pop-up-content">
             <p class="text-2xl font-semibold">
-                <?= Session::displayPopUp('pop_up') ?>
+                <?= FlashMsg::displayPopUp('pop_up') ?>
             </p>
         </div>
     </div>

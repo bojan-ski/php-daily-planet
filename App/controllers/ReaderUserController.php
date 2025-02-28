@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Models\ArticlesModels;
-use Exception;
-use Framework\Database;
 use Framework\Session;
+use Exception;
 
 class ReaderUserController extends ArticlesModels
 {
@@ -71,7 +70,7 @@ class ReaderUserController extends ArticlesModels
                 'article_id' => $articleId
             ];
 
-                $isBookmarked = $this->isBookmarkedArticles($bookmarkParams);
+                $isBookmarked = $this->isArticleBookmarked($bookmarkParams);
 
             // if bookmarked
             if ($isBookmarked) {
@@ -106,7 +105,7 @@ class ReaderUserController extends ArticlesModels
 
                 try {
                     // delete account from db
-                    $this->db->dbQuery("DELETE FROM users WHERE id = :id", $userId);
+                    $this->dbQuery("DELETE FROM users WHERE id = :id", $userId);
 
                     // delete user data from session
                     Session::clearAll();

@@ -11,10 +11,11 @@ use App\Controllers\ErrorController;
 
 class Database
 {
-    protected PDO $conn;
+    private PDO $conn;
 
-    public function __construct(array $config)
+    public function __construct()
     {
+        $config = require basePath('config/db.php');
         $dsn = "mysql:host={$config['host']};dbname={$config['dbname']}";
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
