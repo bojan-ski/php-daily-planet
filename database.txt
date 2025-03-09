@@ -55,7 +55,7 @@ CREATE TABLE `daily_planet_db`.`bookmarked` (
 -- UPDATE TABLES -> CONNECT --
 ALTER TABLE `daily_planet_db`.`bookmarked` 
 ADD INDEX `fk_user_idx` (`user_id` ASC) VISIBLE;
-;
+
 ALTER TABLE `daily_planet_db`.`bookmarked` 
 ADD CONSTRAINT `fk_user`
   FOREIGN KEY (`user_id`)
@@ -66,27 +66,9 @@ ADD CONSTRAINT `fk_user`
 
 ALTER TABLE `daily_planet_db`.`bookmarked` 
 ADD INDEX `fk_article_idx` (`article_id` ASC) VISIBLE;
-;
+
 ALTER TABLE `daily_planet_db`.`bookmarked` 
 ADD CONSTRAINT `fk_article`
-  FOREIGN KEY (`article_id`)
-  REFERENCES `daily_planet_db`.`articles` (`id`)
-  ON DELETE CASCADE
-  ON UPDATE CASCADE;
-
-
--- PITAJ --
-ALTER TABLE `daily_planet_db`.`bookmarked` 
-ADD INDEX `fk_users_idx` (`user_id` ASC) VISIBLE,
-ADD INDEX `fk_articles_idx` (`article_id` ASC) VISIBLE;
-;
-ALTER TABLE `daily_planet_db`.`bookmarked` 
-ADD CONSTRAINT `fk_users`
-  FOREIGN KEY (`user_id`)
-  REFERENCES `daily_planet_db`.`users` (`id`)
-  ON DELETE CASCADE
-  ON UPDATE CASCADE,
-ADD CONSTRAINT `fk_articles`
   FOREIGN KEY (`article_id`)
   REFERENCES `daily_planet_db`.`articles` (`id`)
   ON DELETE CASCADE

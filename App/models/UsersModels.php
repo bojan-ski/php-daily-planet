@@ -91,6 +91,7 @@ class UsersModels extends Database
         }
     }
 
+    // DELETE READER USER/ACCOUNT FROM DB - reader user
     public function deleteReaderUserAccount(array $userId): void
     {
         try {
