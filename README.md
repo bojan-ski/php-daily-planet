@@ -46,6 +46,7 @@ It supports **three user roles**: Reader, Author, and Admin — each with specif
 ---
 
 ## 📂 Project Structure
+```
 │── App/            # Application logic (Controllers, Models, Views, routes)
 │── Framework/      # Core framework files
 │── config/         # Configurations (DB setup)
@@ -54,6 +55,7 @@ It supports **three user roles**: Reader, Author, and Admin — each with specif
 │── Dump20250223.sql # Database dump
 │── composer.json   # Composer dependencies
 │── .htaccess       # Apache rewrite rules
+```
 
 ---
 
@@ -79,10 +81,10 @@ composer install
 Create a `.env` file in the root directory:
 ```env
 # Database Configuration
-DB_HOST=localhost
-DB_NAME=daily_planet
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
+DB_HOST=
+DB_NAME=
+DB_USERNAME=
+DB_PASSWORD=
 
 # Articles - Database limit (customize as needed)
 LIMIT=12
